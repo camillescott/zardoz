@@ -25,9 +25,7 @@ def resolve_expr(roll, *args):
     sanitized = []
 
     for token in tokens:
-        if token in DELIMS:
-            sanitized.append(token)
-        elif token.isnumeric():
+        if token in DELIMS or token.isnumeric():
             sanitized.append(token)
         else:
             try:
@@ -43,6 +41,11 @@ def resolve_expr(roll, *args):
     return sanitized, resolved
 
 
+def solve_expr(tokens):
+    solved = eval(' '.join([(repr(t) if not isinstance(t, str) else t) for t in tokens]))
+    return solved
+
+
 class RollList:
     def __init__(self, expr, roll):
         self.expr = expr
@@ -52,17 +55,27 @@ class RollList:
         else:
             self.roll = list(roll)
 
+    def __iter__(self):
+        for r in self.roll:
+            yield r
+
     def __str__(self):
         roll = self.roll
         if len(self.roll) == 1:
             roll = self.roll[0]
         return f'{{{self.expr}=>{roll}}}'
+
+    def __repr__(self):
+        return f'RollList("{self.expr}", {self.roll})'
     
     def __add__(self, other):
         if isinstance(other, RollList):
-            return RollList(self.roll + other.roll)
+            return RollList(f'{self} + {other}', self.roll + other.roll)
         else:
-            return RollList((r + other for r in other.roll))
+            return RollList(f'{self} + {other}', (r + other for r in self.roll))
+
+    def __sub__(self, other):
+        return RollList(f'{self} - {other}', (r - other for r in self.roll))
 
     def __lt__(self, other):
         return [r < other for r in self.roll]

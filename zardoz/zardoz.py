@@ -12,7 +12,7 @@ import sys
 import typing
 
 from database import RollHistory
-from rolls import resolve_expr
+from rolls import resolve_expr, solve_expr
 
 
 # Set up rich logging handler
@@ -37,22 +37,35 @@ else:
 
 HISTORY = RollHistory('rolls.json')
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='/')
 
 
-@bot.command(name='zr', help='Evaluate a dice roll.')
-async def zardoz_roll(ctx, *roll_expr):
-    log.info(f'Received expr: "{roll_expr}" from {ctx.guild}:{ctx.author}')
+@bot.command(name='z', help='Evaluate a dice roll.')
+async def zardoz_roll(ctx, *args):
+    log.info(f'Received expr: "{args}" from {ctx.guild}:{ctx.author}')
+
+    roll_expr, tag = [], ''
+    for i, token in enumerate(args):
+        if token.startswith('#'):
+            roll_expr = args[:i]
+            tag = ' '.join(args[i:])
+    if not tag:
+        roll_expr = args
+    tag = tag.strip('# ')
 
     try:
         tokens, resolved = resolve_expr(*roll_expr)
-    except Exception as e:
+        solved = list(solve_expr(tokens))
+    except ValueError  as e:
         log.error(f'Invalid expression: {roll_expr} {e}.')
         await ctx.send(f'You fucked up yer roll, {ctx.author}.')
     else:
-        result = f'Request:    {" ".join(roll_expr)}\n'\
-                 f'Rolled out: {resolved}'
-        await ctx.send(result)
+        user = ctx.author
+        result = [f'**{user.nick if user.nick else user.name}**' + (f', *{tag}*' if tag else ''),
+                  f'Request: `{" ".join(roll_expr)}`',
+                  f'Rolled out: `{resolved}`',
+                  f'Result: `{solved}`']
+        await ctx.send('\n'.join(result))
         HISTORY.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
 
 
