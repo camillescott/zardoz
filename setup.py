@@ -10,7 +10,10 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [ ]
+requirements = ['discord.py',
+                'rich',
+                'dice',
+                'tinydb']
 
 setup_requirements = ['pytest-runner', ]
 
@@ -20,6 +23,11 @@ setup(
     author="Camille Scott",
     author_email='cswel@ucdavis.edu',
     python_requires='>=3.5',
+    entry_points={
+        'console_scripts': [
+            'zardoz = zardoz:main'
+        ]
+    },
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
