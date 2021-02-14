@@ -68,7 +68,7 @@ def main():
         else:
             roll_desc = list(solved)
 
-        header = f'**{user.nick if user.nick else user.name}**' + (f', *{tag}*' if tag else '')
+        header = f'{user.mention}' + (f', *{tag}*' if tag else '')
         result = [f'*Request:*\n```{" ".join(roll_expr)}```',
                   f'*Rolled out:*\n```{resolved}```',
                   f'*Result:*\n```{roll_desc}```']
@@ -93,8 +93,8 @@ def main():
         else:
             roll_desc = list(solved)
 
-        header = f'**{user.nick if user.nick else user.name}**' + (f', *{tag}*' if tag else '')
-        result =f'*Result:*\n```{roll_desc}```'
+        header = f'**{user.mention}**' + (f', *{tag}*' if tag else '')
+        result =f'```{roll_desc}```'
         msg = f'{header}\n{result}'
         await ctx.send(msg)
 
