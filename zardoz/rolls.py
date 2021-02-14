@@ -4,6 +4,9 @@ from dice import DiceException
 import logging
 import re
 
+from .state import GameMode, MODE_DICE
+
+
 log = logging.getLogger('discord')
 
 
@@ -15,7 +18,11 @@ def split_operators(word):
     return [t for t in re.split(f'({SPLIT_PAT})', word) if t not in ' ()']
 
 
-def resolve_expr(roll, *args):
+def resolve_expr(roll, *args, mode = None):
+
+    if mode is not None and not isinstance(mode, GameMode):
+        raise ValueError('mode must be of type GameMode')
+
     # first, do split on roll to seperate operators if lacking whitespace
     # we want to handle + and - ourselves rather than leaving it to Dice
     tokens = split_operators(roll)
@@ -28,6 +35,8 @@ def resolve_expr(roll, *args):
         if token in DELIMS or token.isnumeric():
             sanitized.append(token)
         else:
+            if mode is not None and token == 'r':
+                token = MODE_DICE[mode]
             try:
                 resolved = dice.roll(token)
             except DiceException:

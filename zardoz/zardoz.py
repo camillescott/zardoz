@@ -13,22 +13,15 @@ import logging
 import sys
 import typing
 
-from .database import RollHistory
+from .state import Database, GameMode, ModeCommand, ModeConvert, MODE_META
 from .rolls import resolve_expr, solve_expr
-
-
-class GameMode(Enum):
-    DEFAULT = 1
-    RT = 2
-    DND = 3
-    AW = 4
 
 
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--auth-file', default='auth.json')
-    parser.add_argument('--history-file', default='rolls.json')
+    parser.add_argument('--auth', default='auth.json')
+    parser.add_argument('--database', default='db.json')
     args = parser.parse_args()
 
     # Set up rich logging handler
@@ -39,7 +32,7 @@ def main():
     log = logging.getLogger('discord')
 
     # parse authentication data
-    with open(args.auth_file) as fp:
+    with open(args.auth) as fp:
         auth = json.load(fp)
     try:
         TOKEN = auth['token']
@@ -50,9 +43,14 @@ def main():
         log.info(f'TOKEN: {TOKEN}')
 
     # get a handle for the history database
-    HISTORY = RollHistory(args.history_file)
+    DB = Database(args.database)
 
     bot = commands.Bot(command_prefix='/')
+
+    @bot.event
+    async def on_ready():
+        log.info(f'Ready: member of {bot.guilds}')
+        DB.add_guilds(bot.guilds)
 
     @bot.command(name='z', help='Evaluate a dice roll.')
     async def zardoz_roll(ctx, *args):
@@ -67,8 +65,10 @@ def main():
             roll_expr = args
         tag = tag.strip('# ')
 
+        game_mode = DB.get_guild_mode(ctx.guild)
+
         try:
-            tokens, resolved = resolve_expr(*roll_expr)
+            tokens, resolved = resolve_expr(*roll_expr, mode=game_mode)
             solved = list(solve_expr(tokens))
         except ValueError  as e:
             log.error(f'Invalid expression: {roll_expr} {e}.')
@@ -80,18 +80,27 @@ def main():
                       f'Rolled out: `{resolved}`',
                       f'Result: `{solved}`']
             await ctx.send('\n'.join(result))
-            HISTORY.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
+            DB.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
 
 
     @bot.command(name='zhist', help='Display roll history.')
     async def zardoz_history(ctx, max_elems: typing.Optional[int] = -1):
         log.info(f'CMD zhist {max_elems}.')
 
-        guild_hist = HISTORY.query_guild(ctx.guild)
+        guild_hist = DB.query_guild(ctx.guild)
         guild_hist = '\n'.join((f'{item["member_nick"]}: {item["expr"]} => {item["result"]}' for item in guild_hist))
         await ctx.send(f'Roll History:\n{guild_hist}')
 
+
+    @bot.command(name='zmode')
+    async def zardoz_mode(ctx, sub_cmd: ModeCommand, 
+                          mode: typing.Optional[ModeConvert]):
+        current_mode = sub_cmd(DB, mode)
+        await ctx.send(f'**Mode:**: {GameMode(current_mode).name}\n'\
+                       f'*{MODE_META[current_mode]}*')
+
     bot.run(TOKEN)
+
 
 if __name__ == '__main__':
     main()
