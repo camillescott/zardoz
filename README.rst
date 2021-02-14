@@ -33,7 +33,7 @@ Features
 Examples
 --------
 
-For a basic roll, `/z 1d100`:
+For a basic roll, ``/z 1d100``::
 
     Request:
     1d100
@@ -42,7 +42,7 @@ For a basic roll, `/z 1d100`:
     Result:
     [53]
 
-Multiple dice, `/z 3d100`:
+Multiple dice, ``/z 3d100``::
 
     Request:
     3d100
@@ -51,7 +51,7 @@ Multiple dice, `/z 3d100`:
     Result:
     [27, 83, 73]
 
-Distributed addition and subtraction, `/z 3d100 + 10`:
+Distributed addition and subtraction, ``/z 3d100 + 10``::
 
     Request:
     3d100 + 10
@@ -60,7 +60,7 @@ Distributed addition and subtraction, `/z 3d100 + 10`:
     Result:
     [57, 40, 29]
 
-Comparisons:
+Comparisons::
 
     Request:
     4d6 <= 4
@@ -72,7 +72,7 @@ Comparisons:
     4 ⤳ succeeded by 0
     2 ⤳ succeeded by 2
 
-DoF/Dos, `/z 3d100 <= 50`:
+DoF/Dos, ``/z 3d100 <= 50``::
 
     Request:
     3d100 <= 50
@@ -83,7 +83,7 @@ DoF/Dos, `/z 3d100 <= 50`:
     11 ⤳ 3 DoS
     88 ⤳ 3 DoF
 
-Order of operations, `/z 3d100 <= 50 + 5`:
+Order of operations, ``/z 3d100 <= 50 + 5``::
 
     Request:
     3d100 <= 50 + 5
