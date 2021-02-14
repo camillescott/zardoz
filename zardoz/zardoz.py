@@ -14,7 +14,7 @@ import sys
 import typing
 
 from .state import Database, GameMode, ModeCommand, ModeConvert, MODE_META
-from .rolls import resolve_expr, solve_expr
+from .rolls import resolve_expr, solve_expr, RollList, DiceDelta
 
 
 def main():
@@ -69,17 +69,26 @@ def main():
 
         try:
             tokens, resolved = resolve_expr(*roll_expr, mode=game_mode)
-            solved = list(solve_expr(tokens))
+            solved = solve_expr(tokens)
         except ValueError  as e:
             log.error(f'Invalid expression: {roll_expr} {e}.')
             await ctx.send(f'You fucked up yer roll, {ctx.author}.')
         else:
             user = ctx.author
-            result = [f'**{user.nick if user.nick else user.name}**' + (f', *{tag}*' if tag else ''),
-                      f'Request: `{" ".join(roll_expr)}`',
-                      f'Rolled out: `{resolved}`',
-                      f'Result: `{solved}`']
-            await ctx.send('\n'.join(result))
+
+            if isinstance(solved, DiceDelta):
+                roll_desc = solved.describe(mode = game_mode)
+            else:
+                roll_desc = list(solved)
+
+            header = f'**{user.nick if user.nick else user.name}**' + (f', *{tag}*' if tag else '')
+            result = [f'*Request:*\n```{" ".join(roll_expr)}```',
+                      f'*Rolled out:*\n```{resolved}```',
+                      f'*Result:*\n```{roll_desc}```']
+            result = ''.join(result)
+            msg = '\n'.join((header, result))
+
+            await ctx.send(msg)
             DB.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
 
 

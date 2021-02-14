@@ -72,7 +72,7 @@ class RollList:
         roll = self.roll
         if len(self.roll) == 1:
             roll = self.roll[0]
-        return f'{{{self.expr}=>{roll}}}'
+        return f'{{{self.expr} ⤳ {roll}}}'
 
     def __repr__(self):
         return f'RollList("{self.expr}", {self.roll})'
@@ -87,16 +87,54 @@ class RollList:
         return RollList(f'{self} - {other}', (r - other for r in self.roll))
 
     def __lt__(self, other):
-        return [r < other for r in self.roll]
+        deltas = [abs(other - r) for r in self.roll]
+        preds =  [r < other for r in self.roll]
+        return DiceDelta(self.roll, deltas, preds, f'{self} < {other}')
 
     def __le__(self, other):
-        return [r <= other for r in self.roll]
+        preds = [r <= other for r in self.roll]
+        deltas = [abs(other - r) for r in self.roll]
+        return DiceDelta(self.roll, deltas, preds, f'{self} <= {other}')
 
     def __eq__(self, other):
         return [r == other for r in self.roll]
 
     def __gt__(self, other):
-        return [r > other for r in self.roll]
+        preds = [r > other for r in self.roll]
+        deltas = [abs(r - other) for r in self.roll]
+        return DiceDelta(self.roll, deltas, preds, f'{self} > {other}')
 
     def __ge__(self, other):
-        return [r >= other for r in self.roll]
+        preds = [r >= other for r in self.roll]
+        deltas = [abs(r - other) for r in self.roll]
+        return DiceDelta(self.roll, deltas, preds, f'{self} >= {other}')
+
+
+class DiceDelta:
+
+    def __init__(self, rolls, deltas, predicates, expr=''):
+        self.rolls = rolls
+        self.deltas = deltas
+        self.predicates = predicates
+        self.expr = expr
+
+    def describe(self, mode = None):
+        if mode is not None and not isinstance(mode, GameMode):
+            raise ValueError('mode must be of type GameMode')
+        desc = []
+        for roll, delta, pred in zip(self.rolls, self.deltas, self.predicates):
+            if mode is GameMode.RT and 'd100' in self.expr:
+                degrees = delta // 10
+                if degrees > 0:
+                    kind = 'DoS' if pred else 'DoF'
+                    result = f'{degrees} {kind}'
+                else:
+                    result = 'success' if pred else 'failure'
+                desc.append(f'{roll:4} ⤳ {result}')
+            else:
+                kind = 'succeeded by' if pred else 'failed by'
+                desc.append(f'{roll:4} ⤳ {kind} {delta}')
+        return '\n'.join(desc)
+
+
+
