@@ -55,6 +55,30 @@ def solve_expr(tokens):
     return solved
 
 
+async def handle_roll(ctx, log, db, game_mode, *args):
+    log.info(f'Received expr: "{args}" from {ctx.guild}:{ctx.author}')
+
+    roll_expr, tag = [], ''
+    for i, token in enumerate(args):
+        if token.startswith('#'):
+            roll_expr = args[:i]
+            tag = ' '.join(args[i:])
+    if not tag:
+        roll_expr = args
+    tag = tag.strip('# ')
+
+    try:
+        tokens, resolved = resolve_expr(*roll_expr, mode=game_mode)
+        solved = solve_expr(tokens)
+    except ValueError  as e:
+        log.error(f'Invalid expression: {roll_expr} {e}.')
+        await ctx.send(f'You fucked up yer roll, {ctx.author}.')
+        return None, None, None
+    else:
+        db.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
+        return tag, resolved, solved
+
+
 class RollList:
     def __init__(self, expr, roll):
         self.expr = expr

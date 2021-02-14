@@ -14,7 +14,7 @@ import sys
 import typing
 
 from .state import Database, GameMode, ModeCommand, ModeConvert, MODE_META
-from .rolls import resolve_expr, solve_expr, RollList, DiceDelta
+from .rolls import resolve_expr, solve_expr, RollList, DiceDelta, handle_roll
 
 
 def main():
@@ -56,41 +56,47 @@ def main():
     async def zardoz_roll(ctx, *args):
         log.info(f'Received expr: "{args}" from {ctx.guild}:{ctx.author}')
 
-        roll_expr, tag = [], ''
-        for i, token in enumerate(args):
-            if token.startswith('#'):
-                roll_expr = args[:i]
-                tag = ' '.join(args[i:])
-        if not tag:
-            roll_expr = args
-        tag = tag.strip('# ')
+        game_mode = DB.get_guild_mode(ctx.guild)
+        tag, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
+        if not solved:
+            return
+
+        user = ctx.author
+
+        if isinstance(solved, DiceDelta):
+            roll_desc = solved.describe(mode = game_mode)
+        else:
+            roll_desc = list(solved)
+
+        header = f'**{user.nick if user.nick else user.name}**' + (f', *{tag}*' if tag else '')
+        result = [f'*Request:*\n```{" ".join(roll_expr)}```',
+                  f'*Rolled out:*\n```{resolved}```',
+                  f'*Result:*\n```{roll_desc}```']
+        result = ''.join(result)
+        msg = '\n'.join((header, result))
+
+        await ctx.send(msg)
+
+    @bot.command(name='zq', help='Evaluate a dice roll, quietly.')
+    async def zardoz_quiet_roll(ctx, *args):
+        log.info(f'Received expr: "{args}" from {ctx.guild}:{ctx.author}')
 
         game_mode = DB.get_guild_mode(ctx.guild)
+        tag, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
+        if not solved:
+            return
 
-        try:
-            tokens, resolved = resolve_expr(*roll_expr, mode=game_mode)
-            solved = solve_expr(tokens)
-        except ValueError  as e:
-            log.error(f'Invalid expression: {roll_expr} {e}.')
-            await ctx.send(f'You fucked up yer roll, {ctx.author}.')
+        user = ctx.author
+
+        if isinstance(solved, DiceDelta):
+            roll_desc = solved.describe(mode = game_mode)
         else:
-            user = ctx.author
+            roll_desc = list(solved)
 
-            if isinstance(solved, DiceDelta):
-                roll_desc = solved.describe(mode = game_mode)
-            else:
-                roll_desc = list(solved)
-
-            header = f'**{user.nick if user.nick else user.name}**' + (f', *{tag}*' if tag else '')
-            result = [f'*Request:*\n```{" ".join(roll_expr)}```',
-                      f'*Rolled out:*\n```{resolved}```',
-                      f'*Result:*\n```{roll_desc}```']
-            result = ''.join(result)
-            msg = '\n'.join((header, result))
-
-            await ctx.send(msg)
-            DB.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
-
+        header = f'**{user.nick if user.nick else user.name}**' + (f', *{tag}*' if tag else '')
+        result =f'*Result:*\n```{roll_desc}```'
+        msg = f'{header}\n{result}'
+        await ctx.send(msg)
 
     @bot.command(name='zhist', help='Display roll history.')
     async def zardoz_history(ctx, max_elems: typing.Optional[int] = -1):
@@ -101,12 +107,11 @@ def main():
         await ctx.send(f'Roll History:\n{guild_hist}')
 
 
-    @bot.command(name='zmode')
+    @bot.command(name='zmode', help='Set the game mode for the server')
     async def zardoz_mode(ctx, sub_cmd: ModeCommand, 
                           mode: typing.Optional[ModeConvert]):
-        current_mode = sub_cmd(DB, mode)
-        await ctx.send(f'**Mode:**: {GameMode(current_mode).name}\n'\
-                       f'*{MODE_META[current_mode]}*')
+        await sub_cmd(DB, mode)
+
 
     bot.run(TOKEN)
 
