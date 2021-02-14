@@ -73,10 +73,10 @@ async def handle_roll(ctx, log, db, game_mode, *args):
     except ValueError  as e:
         log.error(f'Invalid expression: {roll_expr} {e}.')
         await ctx.send(f'You fucked up yer roll, {ctx.author}.')
-        return None, None, None
+        return None, None, None, None
     else:
         db.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
-        return tag, resolved, solved
+        return tag, roll_expr, resolved, solved
 
 
 class RollList:

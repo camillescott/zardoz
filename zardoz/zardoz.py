@@ -57,7 +57,7 @@ def main():
         log.info(f'Received expr: "{args}" from {ctx.guild}:{ctx.author}')
 
         game_mode = DB.get_guild_mode(ctx.guild)
-        tag, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
+        tag, roll_expr, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
         if not solved:
             return
 
@@ -82,7 +82,7 @@ def main():
         log.info(f'Received expr: "{args}" from {ctx.guild}:{ctx.author}')
 
         game_mode = DB.get_guild_mode(ctx.guild)
-        tag, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
+        tag, roll_expr, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
         if not solved:
             return
 
