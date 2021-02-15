@@ -97,32 +97,6 @@ class ModeConvert(commands.Converter):
         return converted
 
 
-class ModeCommand(commands.Converter):
-
-    CMDS = ['set', 'get', 'list']
-
-    async def convert(self, ctx, argument):
-        if argument not in ModeCommand.CMDS:
-            raise commands.BadArgument(f'Argument must be one of {ModeCommand.CMDS}.')
-        async def mode_func(db, mode_arg = None):
-            if argument == 'set':
-                if mode_arg is None:
-                    mode_arg = GameMode.DEFAULT
-                db.set_guild_mode(ctx.guild, mode_arg)
-                await ctx.send(f'**Set Mode:**: {GameMode(mode_arg).name}')
-                return mode_arg
-            if argument == 'get':
-                current_mode = db.get_guild_mode(ctx.guild)
-                await ctx.send(f'**Mode:**: {GameMode(current_mode).name}\n'\
-                               f'*{MODE_META[current_mode]}*')
-                return current_mode
-            if argument == 'list':
-                modes = '\n'.join((f'{mode.name}: {MODE_META[mode]}' for mode in GameMode))
-                await ctx.send(modes)
-
-        return mode_func
-
-
 class VarCommand(commands.Converter):
 
     CMDS = ['set', 'get', 'list']

@@ -13,7 +13,7 @@ import logging
 import sys
 import typing
 
-from .state import Database, GameMode, ModeCommand, ModeConvert, MODE_META, VarCommand
+from .state import Database, GameMode, ModeConvert, MODE_META, VarCommand
 from .rolls import resolve_expr, solve_expr, RollList, DiceDelta, handle_roll
 
 
@@ -131,11 +131,36 @@ def main():
         guild_hist = '\n'.join((f'{item["member_nick"]}: {item["expr"]} ⟿  {item["result"]}' for item in guild_hist))
         await ctx.send(f'Roll History:\n{guild_hist}')
 
+    #
+    # Mode subcommands
+    #
 
-    @bot.command(name='zmode', help='Set the game mode for the server')
-    async def zardoz_mode(ctx, sub_cmd: ModeCommand, 
-                          mode: typing.Optional[ModeConvert]):
-        await sub_cmd(DB, mode)
+    @bot.group(name='zmode', help='Set the game mode for the server')
+    async def zardoz_mode(ctx):
+        if ctx.invoked_subcommand is None:
+            pass
+    
+    @zardoz_mode.command(name='set', help='Set the mode for the server.')
+    async def zardoz_mode_set(ctx, mode: typing.Optional[ModeConvert]):
+        if mode is None:
+            mode = GameMode.DEFAULT
+        DB.set_guild_mode(ctx.guild, mode)
+        await ctx.send(f'**Set Mode:**: {GameMode(mode).name}')
+
+    @zardoz_mode.command(name='get', help='Display the server mode.')
+    async def zardoz_mode_get(ctx):
+        current_mode = DB.get_guild_mode(ctx.guild)
+        await ctx.send(f'**Mode:**: {GameMode(current_mode).name}\n'\
+                       f'*{MODE_META[current_mode]}*')
+
+    @zardoz_mode.command(name='list', help='List available modes.')
+    async def zardoz_mode_list(ctx):
+        modes = '\n'.join((f'{mode.name}: {MODE_META[mode]}' for mode in GameMode))
+        await ctx.send(modes)
+
+    #
+    # Variable subcommands
+    #
 
     @bot.command(name='zvar', help='Set a variable for the server')
     async def zardoz_var(ctx, sub_cmd: VarCommand,
