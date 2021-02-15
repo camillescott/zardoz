@@ -74,7 +74,7 @@ def expand_tokens(tokens, mode = None, variables = {}):
                 resolved = dice.roll(token)
             except DiceException:
                 log.error(f'Got invalid token: {token}.')
-                raise ValueError(f'That roll doesn\'t work: {token}.')
+                raise ValueError(f'I don\'t like this argument: {token}.')
             else:
                 expanded.append(RollList(token, resolved))
 

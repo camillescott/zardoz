@@ -61,7 +61,7 @@ def main():
             roll = RollHandler(ctx, log, DB, args)
         except ValueError as e:
             log.error(f'Roll handling failed: {e}')
-            await ctx.message.reply(f'You fucked up your roll, {ctx.author}: {e}')
+            await ctx.message.reply(f'You fucked up your roll, {ctx.author}. {e}')
         else:
             await ctx.message.reply(roll.msg())
 
@@ -72,23 +72,22 @@ def main():
             roll = QuietRollHandler(ctx, log, DB, args)
         except ValueError as e:
             log.error(f'Roll handling failed: {e}')
-            await ctx.message.reply(f'You fucked up your roll, {ctx.author}: {e}')
+            await ctx.message.reply(f'You fucked up your roll, {ctx.author}. {e}')
         else:
             await ctx.message.reply(roll.msg())
 
     @bot.command(name='zs', help='Make a secret roll and DM to member.')
     async def zardoz_secret_roll(ctx, member: typing.Optional[discord.Member], *args):
+        if member is None:
+            member = ctx.author
 
         try:
             roll = SekretRollHandler(ctx, log, DB, args, require_tag=True)
         except ValueError as e:
             log.error(f'Roll handling failed: {e}')
-            await ctx.send(f'You fucked up your roll, {ctx.author}: {e}')
+            await ctx.author.send(f'You fucked up your roll, {ctx.author}. {e}')
         else:
-            if member is None:
-                await ctx.author.send(roll.msg())
-            else:
-                await member.send(roll.msg())
+            await member.send(roll.msg())
 
     @bot.command(name='zhist', help='Display roll history.')
     async def zardoz_history(ctx, max_elems: typing.Optional[int] = -1):
