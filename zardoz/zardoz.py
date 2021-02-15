@@ -188,18 +188,21 @@ def main():
             table = CRITS[table_name]
         except KeyError:
             log.error(f'Error: no such crit: {table_name}.')
-            return
+            await ctx.message.reply(f'No crit table named {table_name}.')
         else:
-            if val is None:
-                val, name, effect = table.roll()
+            try:
+                if val is None:
+                    val, name, effect = table.roll()
+                else:
+                    name, effect = table.get(val)
+            except ValueError:
+                await ctx.message.reply(f'Bad crit table value. Perils be upon ye.')
             else:
-                name, effect = table.get(val)
-
-            msg = f'**Result:** {table.die} ⤳ {val}\n'\
-                  f'**Table:** {table.full_name} ({table.game}, {table.book})\n'\
-                  f'**Name:** {name}\n'\
-                  f'**Effect:** {effect}'
-            await ctx.message.reply(msg)
+                msg = f'**Result:** {table.die} ⤳ {val}\n'\
+                      f'**Table:** {table.full_name} ({table.game}, {table.book})\n'\
+                      f'**Name:** {name}\n'\
+                      f'**Effect:** {effect}'
+                await ctx.message.reply(msg)
 
     @bot.group(name='ztest')
     async def zardoz_test(ctx, arg):

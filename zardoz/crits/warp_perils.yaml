@@ -72,7 +72,7 @@ rolls:
     name: Daemonhost
     effect: | 
       The Psyker must immediately pass a Very Hard (–30) Willpower Test or be possessed by a Daemon and become a Daemonhost! Create an Unbound Daemonhost (See Chapter XII: Aliens, Heretics & Antagonists) that will immediately attack. Only the destruction of the Daemonhost will free the Psyker (though he may die anyway if his body is destroyed in the process). If the Psyker does somehow manage to survive this result, he automatically gains 4d10 Corruption Points.
-  - range: [100, 100]
+  - range: [100, 1000]
     name: Warp Feast
     effect: |
       A rift in reality is torn open and the Psyker is sucked into the warp with a little burping noise. He is no more. 

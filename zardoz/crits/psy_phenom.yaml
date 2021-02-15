@@ -104,6 +104,6 @@ rolls:
     name: Warp Madness
     effect: | 
       A violent ripple of tainted discord causes all creatures within 2d10 metres (with the exception of the Psyker) to become Frenzied for a Round and suffer 1d5 Corruption Points unless they can pass a Difficult (–10) Willpower Test, in which case they only suffer one point of Corruption.
-  - range: [76, 100]
+  - range: [76, 1000]
     name: Perils of the Warp
     effect: Roll for Warp Perils (`warp_perils`)
