@@ -34,7 +34,7 @@ class CritTable:
         for option in self.rolls:
             lower, upper = option['range']
             if lower <= roll <= upper:
-                return option['name'], option['effect']
+                return option['name'].strip(), option['effect'].strip()
 
         raise ValueError(f'No entry for {roll}')
 
@@ -42,7 +42,7 @@ class CritTable:
         rolled_val = int(dice.roll(self.die))
         name, effect = self.get(rolled_val)
 
-        return rolled_val, name.strip(), effect.strip()
+        return rolled_val, name, effect
 
 
 

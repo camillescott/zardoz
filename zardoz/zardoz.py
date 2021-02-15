@@ -183,14 +183,18 @@ def main():
         pass
 
     @zardoz_crit.command(name='r')
-    async def zardoz_crit_roll(ctx, table_name: str):
+    async def zardoz_crit_roll(ctx, table_name: str, val: typing.Optional[int]):
         try:
             table = CRITS[table_name]
         except KeyError:
             log.error(f'Error: no such crit: {table_name}.')
             return
         else:
-            val, name, effect = table.roll()
+            if val is None:
+                val, name, effect = table.roll()
+            else:
+                name, effect = table.get(val)
+
             msg = f'**Result:** {table.die} ⤳ {val}\n'\
                   f'**Table:** {table.full_name} ({table.game}, {table.book})\n'\
                   f'**Name:** {name}\n'\
