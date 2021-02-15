@@ -60,6 +60,7 @@ def main():
         try:
             roll = RollHandler(ctx, log, DB, args)
         except ValueError as e:
+            log.error(f'Roll handling failed: {e}')
             await ctx.message.reply(f'You fucked up your roll, {ctx.author}: {e}')
         else:
             await ctx.message.reply(roll.msg())
@@ -70,6 +71,7 @@ def main():
         try:
             roll = QuietRollHandler(ctx, log, DB, args)
         except ValueError as e:
+            log.error(f'Roll handling failed: {e}')
             await ctx.message.reply(f'You fucked up your roll, {ctx.author}: {e}')
         else:
             await ctx.message.reply(roll.msg())
@@ -80,6 +82,7 @@ def main():
         try:
             roll = SekretRollHandler(ctx, log, DB, args, require_tag=True)
         except ValueError as e:
+            log.error(f'Roll handling failed: {e}')
             await ctx.send(f'You fucked up your roll, {ctx.author}: {e}')
         else:
             if member is None:

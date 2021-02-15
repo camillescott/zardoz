@@ -82,15 +82,19 @@ def expand_tokens(tokens, mode = None, variables = {}):
 
 
 def evaluate_expr(expanded_tokens):
+    eval_expr = ' '.join([(repr(t) if not isinstance(t, str) else t) for t in expanded_tokens])
     try:
-        return eval(' '.join([(repr(t) if not isinstance(t, str) else t) for t in expanded_tokens]))
-    except SyntaxError:
-        raise ValueError('Your syntax was scintillating, but I couldn\'t parse it.')
+        return eval(eval_expr), eval_expr
+    except SyntaxError as e:
+        return None, eval_expr
 
 
 class RollHandler:
 
     def __init__(self, ctx, log, db, roll, require_tag=False):
+
+        log.info(f'Roll request: {roll}')
+
         self.ctx = ctx
         self.log = log
         self.db = db
@@ -106,7 +110,13 @@ class RollHandler:
                                       mode = self.game_mode,
                                       variables = variables)
         self.expr =  ' '.join((str(token) for token in self.expanded))
-        self.result = evaluate_expr(self.expanded)
+
+        
+        self.result, eval_expr = evaluate_expr(self.expanded)
+        if self.result is None:
+            log.error(f'Python parsing error: {eval_expr}.')
+            raise ValueError(f'Your syntax was scintillating, but I couldn\'t parse it.')
+
         db.add_roll(ctx.guild, ctx.author, ' '.join(self.tokens), self.expr)
         log.info(str(self))
 
