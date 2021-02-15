@@ -111,7 +111,7 @@ class RollHandler:
         log.info(str(self))
 
     def msg(self):
-        header = f'{self.ctx.author.mention}' + (f', *{self.tag}*' if self.tag else '')
+        header = f':game_die: {self.ctx.author.mention}' + (f': *{self.tag}*' if self.tag else '')
         result = [f'*Request:*\n```{" ".join(self.tokens)}```',
                   f'*Rolled out:*\n```{self.expr}```',
                   f'*Result:*\n```{self.result.describe(mode=self.game_mode)}```']
@@ -135,7 +135,7 @@ class RollHandler:
 class QuietRollHandler(RollHandler):
 
     def msg(self):
-        header = f'**{self.ctx.author.mention}**' + (f', *{self.tag}*' if self.tag else '')
+        header = f'*:game_die: {self.tag}*' if self.tag else ''
         result =f'```{self.result.describe(mode=self.game_mode)}```'
         msg = f'{header}\n{result}'
 

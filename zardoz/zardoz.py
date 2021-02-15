@@ -60,9 +60,9 @@ def main():
         try:
             roll = RollHandler(ctx, log, DB, args)
         except ValueError as e:
-            await ctx.send(f'You fucked up your roll, {ctx.author}: {e}')
+            await ctx.message.reply(f'You fucked up your roll, {ctx.author}: {e}')
         else:
-            await ctx.send(roll.msg())
+            await ctx.message.reply(roll.msg())
 
     @bot.command(name='zq', help='Evaluate a dice roll, quietly.')
     async def zardoz_quiet_roll(ctx, *args):
@@ -70,9 +70,9 @@ def main():
         try:
             roll = QuietRollHandler(ctx, log, DB, args)
         except ValueError as e:
-            await ctx.send(f'You fucked up your roll, {ctx.author}: {e}')
+            await ctx.message.reply(f'You fucked up your roll, {ctx.author}: {e}')
         else:
-            await ctx.send(roll.msg())
+            await ctx.message.reply(roll.msg())
 
     @bot.command(name='zs', help='Make a secret roll and DM to member.')
     async def zardoz_secret_roll(ctx, member: typing.Optional[discord.Member], *args):
