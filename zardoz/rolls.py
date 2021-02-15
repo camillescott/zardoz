@@ -198,8 +198,8 @@ class RollList:
         return RollList(f'{self} - {other}', (r - other for r in self.roll))
 
     def __lt__(self, other):
-        deltas = [abs(other - r) for r in self.roll]
         preds =  [r < other for r in self.roll]
+        deltas = [abs(other - r) + int(not p) for r, p in zip(self.roll, preds)]
         return DiceDelta(self.roll, deltas, preds, f'{self} < {other}')
 
     def __le__(self, other):
@@ -212,7 +212,7 @@ class RollList:
 
     def __gt__(self, other):
         preds = [r > other for r in self.roll]
-        deltas = [abs(r - other) for r in self.roll]
+        deltas = [abs(other - r) + int(not p) for r, p in zip(self.roll, preds)]
         return DiceDelta(self.roll, deltas, preds, f'{self} > {other}')
 
     def __ge__(self, other):
@@ -243,7 +243,7 @@ class DiceDelta:
                     result = 'success' if pred else 'failure'
                 desc.append(f'{roll:4} ⤳ {result}')
             else:
-                kind = 'succeeded by' if pred else 'failed by'
+                kind = 'S by' if pred else 'F by'
                 desc.append(f'{roll:4} ⤳ {kind} {delta}')
         return '\n'.join(desc)
 
