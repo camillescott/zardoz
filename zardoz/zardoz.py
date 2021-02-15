@@ -13,6 +13,7 @@ import logging
 import sys
 import typing
 
+from .crit import load_crit_tables
 from .state import Database, GameMode, ModeConvert, MODE_META
 from .rolls import (RollHandler, QuietRollHandler, SekretRollHandler,
                     RollList, DiceDelta)
@@ -45,6 +46,8 @@ def main():
 
     # get a handle for the history database
     DB = Database(args.database)
+    CRITS = load_crit_tables(log)
+    log.info(f'Loaded crits: {CRITS}')
 
     bot = commands.Bot(command_prefix='/')
 
@@ -170,6 +173,29 @@ def main():
             await ctx.send('\n'.join(result))
         else:
             await ctx.send('**No variables set.**')
+
+    #
+    # Crit table subcommands
+    #
+
+    @bot.group(name='zcrit')
+    async def zardoz_crit(ctx):
+        pass
+
+    @zardoz_crit.command(name='r')
+    async def zardoz_crit_roll(ctx, table_name: str):
+        try:
+            table = CRITS[table_name]
+        except KeyError:
+            log.error(f'Error: no such crit: {table_name}.')
+            return
+        else:
+            val, name, effect = table.roll()
+            msg = f'**Result:** {table.die} ⤳ {val}\n'\
+                  f'**Table:** {table.full_name} ({table.game}, {table.book})\n'\
+                  f'**Name:** {name}\n'\
+                  f'**Effect:** {effect}'
+            await ctx.message.reply(msg)
 
     @bot.group(name='ztest')
     async def zardoz_test(ctx, arg):

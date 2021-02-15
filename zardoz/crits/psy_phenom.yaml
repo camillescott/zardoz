@@ -1,0 +1,109 @@
+full_name: Psychic Phenomena
+slug: psy_phenom
+game: RT
+book: Core.160
+die: 1d100
+rolls:
+  - range: [1, 3]
+    name: Dark Foreboding
+    effect: |
+      A faint breeze blows past the psyker and those near him, and everyone gets the feeling that doom is about to befall them.
+  - range: [4, 5]
+    name: Warp Echo
+    effect: |
+      For a few seconds, all noises cause echoes, regardless of the surroundings.
+  - range: [6, 8]
+    name: Unholy Stench
+    effect: | 
+      The air around the psyker becomes permeated with a bizarre and foul smell.
+  - range: [9, 11]
+    name: Mind Warp
+    effect: | 
+      The psyker gets an itch between his shoulder blades for a few moments. If he fails a Routine (+10) Willpower Test, he suffers 1 Insanity Point as his own inherent phobias, suspicions, and hatreds surge to the surface of his mind in a wave of negative emotion.
+  - range: [12, 14]
+    name: Hoarfrost
+    effect: | 
+      The temperature plummets for an instant, and a thin coating of frost covers everything within 3d10 metres.
+  - range: [15, 17]
+    name: Aura of Taint
+    effect: | 
+      All animals within 1d100 metres become spooked and agitated; Characters with Psyniscience can pinpoint the psyker as the cause.
+  - range: [18,20]
+    name: Memory Worm
+    effect: |
+      All people within line of sight of the psyker forget something trivial.
+  - range: [21, 23]
+    name: Spoilage
+    effect: |
+      Food and drink go bad in a 5d10 metre radius.
+  - range: [24, 26]
+    name: Haunting Breeze
+    effect: | 
+      Winds whip up around the psyker for a few seconds, blowing light objects about and guttering fires within 3d10 metres.
+  - range: [27, 29]
+    name: Veil of Darkness
+    effect: |
+      For a brief moment (effectively the remainder of the round), the area within 3d10 metres is plunged into immediate darkness.
+  - range: [30, 32]
+    name: Distorted Reflections
+    effect: |
+      Mirrors and other reflective surfaces within a radius of 5d10 metres distort or shatter.
+  - range: [33, 35]
+    name: Breath Leech
+    effect: |
+      Everyone (including the psyker) becomes short of breath for one round and cannot make any Run or Charge actions.
+  - range: [36, 38]
+    name: Daemonic Mask
+    effect: |
+      For a fleeting moment, the psyker takes on a daemonic appearance and gains a Fear rating of 1 for the rest of the round. However, he also suffers 1 Corruption Point.
+  - range: [39, 41]
+    name: Unnatural Decay
+    effect: |
+      All plant-life within 3d10 metres of the psyker withers and dies.
+  - range: [42, 44]
+    name: Spectral Gale
+    effect: |
+      Howling winds erupt around the psyker, requiring him and anyone within 4d10 metres to make an Easy (+30) Agility or Strength Test to avoid being knocked to the ground.
+  - range: [45, 47]
+    name: Bloody Tears
+    effect: | 
+      Blood weeps from stone and wood within 3d10 metres of the psyker. If there are any pictures or statues of people inside this area, they appear to be crying blood.
+  - range: [48, 50]
+    name: The Earth Protests
+    effect: | 
+      The ground suddenly shakes, and everyone (including the psyker) within a 5d10 metre radius must make a Routine (+10) Agility Test or be knocked down.
+  - range: [51, 53]
+    name: Psy Discharge
+    effect: |
+      Static Electricity fills the air for 5d10 metres causing hair to stand on end and unprotected electronics to short out, whilst the psyker is illuminated by eldritch light.
+  - range: [54, 56]
+    name: Warp Ghosts
+    effect: |
+      Ghostly apparitions fill the air for 3d10 metres around the psyker, flying about and howling in pain for a few brief moments. Everyone in the radius (except the psyker himself ) must test against Fear (1).
+  - range: [57, 59]
+    name: Falling Upwards
+    effect: |
+      Everything within 2d10 metres of the psyker (and including the psyker himself ) rises 1d10 metres into the air as gravity briefly ceases. After a second or two, everything crashes back to earth.
+  - range: [60, 62]
+    name: Banshee Howl
+    effect: |
+      A shrill keening rings out across the immediate area, shattering glass and forcing every mortal creature able to hear it (including the psyker) to pass a Challenging (+0) Toughness Test or be deafened for 1d10 rounds.
+  - range: [63, 65]
+    name: The Furies
+    effect: | 
+      The Psyker is assailed by unseen horrors. He is slammed to the ground and suffers 1d5 Wounds in damage (Toughness protects but armour, unless warded, does not) and he must test against Fear (2).
+  - range: [66, 68]
+    name: Shadow of the Warp
+    effect: | 
+      For a split second, the world changes in appearance, and everyone within 1d100 metres has a mercifully brief glimpse of the shadow of the warp. Everyone in the area (including the psyker) must make a Difficult (–10) Willpower Test or gain 1d5 Insanity points.
+  - range: [69, 71]
+    name: Tech Scorn
+    effect: |
+      The Machine spirits reject your unnatural ways. All un-warded tech devices within 5d10 metres malfunction momentarily, and all ranged weapons Jam, whilst characters with cybernetic implants must pass a Routine (+10) Toughness Test or suffer 1d5 damage.
+  - range: [72, 75]
+    name: Warp Madness
+    effect: | 
+      A violent ripple of tainted discord causes all creatures within 2d10 metres (with the exception of the Psyker) to become Frenzied for a Round and suffer 1d5 Corruption Points unless they can pass a Difficult (–10) Willpower Test, in which case they only suffer one point of Corruption.
+  - range: [76, 100]
+    name: Perils of the Warp
+    effect: Roll for Warp Perils (`warp_perils`)
