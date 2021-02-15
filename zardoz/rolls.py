@@ -72,6 +72,7 @@ async def handle_roll(ctx, log, db, game_mode, *args):
         if token.startswith('#'):
             roll_expr = args[:i]
             tag = ' '.join(args[i:])
+            break
     if not tag:
         roll_expr = args
     tag = tag.strip('# ')
