@@ -13,7 +13,7 @@ import logging
 import sys
 import typing
 
-from .state import Database, GameMode, ModeCommand, ModeConvert, MODE_META
+from .state import Database, GameMode, ModeCommand, ModeConvert, MODE_META, VarCommand
 from .rolls import resolve_expr, solve_expr, RollList, DiceDelta, handle_roll
 
 
@@ -111,6 +111,12 @@ def main():
     async def zardoz_mode(ctx, sub_cmd: ModeCommand, 
                           mode: typing.Optional[ModeConvert]):
         await sub_cmd(DB, mode)
+
+    @bot.command(name='zvar', help='Set a variable for the server')
+    async def zardoz_var(ctx, sub_cmd: VarCommand,
+                              var: typing.Optional[str],
+                              val: typing.Optional[int] = 0):
+        await sub_cmd(DB, var, val = val)
 
 
     bot.run(TOKEN)

@@ -29,6 +29,7 @@ class Database:
         self.db = TinyDB(path)
         self.rolls = self.db.table('rolls')
         self.modes = self.db.table('modes')
+        self.vars = self.db.table('vars')
 
     def add_guilds(self, guilds):
         for guild in guilds:
@@ -66,6 +67,25 @@ class Database:
             self.set_guild_mode(guild, GameMode.DEFAULT)
             return GameMode.DEFAULT
 
+    def set_var(self, guild, var, val):
+        self.vars.upsert({'guild_id': guild.id,
+                          'var': var,
+                          'val': val},
+                         (where('guild_id') == guild.id) & (where('var') == var))
+
+    def get_var(self, guild, var):
+        result =  self.vars.get((where('guild_id') == guild.id) & \
+                                (where('var') == var))
+        if result:
+            return result['val']
+        else:
+            return None
+
+    def get_guild_vars(self, guild):
+        result = self.vars.search(where('guild_id') == guild.id)
+        variables = {row['var']: row['val'] for row in result}
+        return variables
+
 
 class ModeConvert(commands.Converter):
 
@@ -101,3 +121,29 @@ class ModeCommand(commands.Converter):
                 await ctx.send(modes)
 
         return mode_func
+
+
+class VarCommand(commands.Converter):
+
+    CMDS = ['set', 'get', 'list']
+
+    async def convert(self, ctx, argument):
+        if argument not in VarCommand.CMDS:
+            raise commands.BadArgument(f'sub_cmd must be one of {VarCommand.CMDS}')
+
+        async def var_func(db, var, val = 0):
+            if var is None or argument == 'list':
+                variables = db.get_guild_vars(ctx.guild)
+                if variables:
+                    result = [f'**{key}**: {val}' for key, val in variables.items()]
+                    await ctx.send('\n'.join(result))
+                else:
+                    await ctx.send('**No variables set.**')
+            if argument == 'set':
+                db.set_var(ctx.guild, var, val)
+                await ctx.send(f'**{var}** = {val}')
+            if argument == 'get':
+                val = db.get_var(ctx.guild, var)
+                await ctx.send(f'**{var}** = {val}')
+
+        return var_func

@@ -18,7 +18,7 @@ def split_operators(word):
     return [t for t in re.split(f'({SPLIT_PAT})', word) if t not in ' ()']
 
 
-def resolve_expr(roll, *args, mode = None):
+def resolve_expr(roll, *args, mode = None, variables={}):
 
     if mode is not None and not isinstance(mode, GameMode):
         raise ValueError('mode must be of type GameMode')
@@ -34,6 +34,10 @@ def resolve_expr(roll, *args, mode = None):
     for token in tokens:
         if token in DELIMS or token.isnumeric():
             sanitized.append(token)
+        elif token.startswith('$'):
+            var = token.strip('$')
+            if var in variables:
+                sanitized.append(variables[var])
         else:
             if mode is not None and token == 'r':
                 token = MODE_DICE[mode]
@@ -68,7 +72,8 @@ async def handle_roll(ctx, log, db, game_mode, *args):
     tag = tag.strip('# ')
 
     try:
-        tokens, resolved = resolve_expr(*roll_expr, mode=game_mode)
+        variables = db.get_guild_vars(ctx.guild)
+        tokens, resolved = resolve_expr(*roll_expr, mode=game_mode, variables=variables)
         solved = solve_expr(tokens)
     except ValueError  as e:
         log.error(f'Invalid expression: {roll_expr} {e}.')
