@@ -10,7 +10,7 @@ from .state import GameMode, MODE_DICE
 log = logging.getLogger('discord')
 
 
-DELIMS = ['+', '-', '<=', '<', '>=', '>', '(', ')']
+DELIMS = ['+', '-', '<=', '<', '>=', '>', '(', ')', '#']
 SPLIT_PAT = '|'.join(map(re.escape, DELIMS))
 
 
