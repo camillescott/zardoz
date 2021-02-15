@@ -41,6 +41,11 @@ def resolve_expr(roll, *args, mode = None, variables={}):
         else:
             if mode is not None and token == 'r':
                 token = MODE_DICE[mode]
+
+            ndice = re.match(r'^\d+', token)
+            if ndice is not None and int(ndice.group(0)) > 69:
+                log.error(f'Too many dice.')
+                raise RuntimeError('Too many dice.')
             try:
                 resolved = dice.roll(token)
             except DiceException:
@@ -78,6 +83,9 @@ async def handle_roll(ctx, log, db, game_mode, *args):
     except ValueError  as e:
         log.error(f'Invalid expression: {roll_expr} {e}.')
         await ctx.send(f'You fucked up yer roll, {ctx.author}.')
+        return None, None, None, None
+    except RuntimeError as e:
+        await ctx.send(f'Woah there cowboy, you trying to crash me? Try using 69 or less dice.')
         return None, None, None, None
     else:
         db.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
