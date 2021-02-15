@@ -14,7 +14,8 @@ import sys
 import typing
 
 from .state import Database, GameMode, ModeConvert, MODE_META
-from .rolls import resolve_expr, solve_expr, RollList, DiceDelta, handle_roll
+from .rolls import (RollHandler, QuietRollHandler, SekretRollHandler,
+                    RollList, DiceDelta)
 
 
 def main():
@@ -56,51 +57,35 @@ def main():
     @bot.command(name='z', help='Evaluate a dice roll.')
     async def zardoz_roll(ctx, *args):
 
-        game_mode = DB.get_guild_mode(ctx.guild)
-        tag, roll_expr, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
-        if not solved:
-            return
-
-        header = f'{ctx.author.mention}' + (f', *{tag}*' if tag else '')
-        result = [f'*Request:*\n```{" ".join(roll_expr)}```',
-                  f'*Rolled out:*\n```{resolved}```',
-                  f'*Result:*\n```{solved.describe(mode=game_mode)}```']
-        result = ''.join(result)
-        msg = '\n'.join((header, result))
-
-        await ctx.send(msg)
+        try:
+            roll = RollHandler(ctx, log, DB, args)
+        except ValueError as e:
+            await ctx.send(f'You fucked up your roll, {ctx.author}: {e}')
+        else:
+            await ctx.send(roll.msg())
 
     @bot.command(name='zq', help='Evaluate a dice roll, quietly.')
     async def zardoz_quiet_roll(ctx, *args):
 
-        game_mode = DB.get_guild_mode(ctx.guild)
-        tag, roll_expr, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
-        if not solved:
-            return
-
-        header = f'**{ctx.author.mention}**' + (f', *{tag}*' if tag else '')
-        result =f'```{solved.describe(mode=game_mode)}```'
-        msg = f'{header}\n{result}'
-
-        await ctx.send(msg)
+        try:
+            roll = QuietRollHandler(ctx, log, DB, args)
+        except ValueError as e:
+            await ctx.send(f'You fucked up your roll, {ctx.author}: {e}')
+        else:
+            await ctx.send(roll.msg())
 
     @bot.command(name='zs', help='Make a secret roll and DM to member.')
-    async def zardoz_secret_roll(ctx, member: discord.Member, *args):
+    async def zardoz_secret_roll(ctx, member: typing.Optional[discord.Member], *args):
 
-        game_mode = DB.get_guild_mode(ctx.guild)
-        tag, roll_expr, resolved, solved = await handle_roll(ctx, log, DB, game_mode, *args)
-        if not solved:
-            return
-
-        header = f'from **{ctx.author}**: ' + (f'*{tag}*' if tag else '')
-        result = [f'*Request:*\n```{" ".join(roll_expr)}```',
-                  f'*Rolled out:*\n```{resolved}```',
-                  f'*Result:*\n```{solved.descibe(mode=game_mode)}```']
-        result = ''.join(result)
-        msg = '\n'.join((header, result))
-
-        await member.send(msg)
-
+        try:
+            roll = SekretRollHandler(ctx, log, DB, args, require_tag=True)
+        except ValueError as e:
+            await ctx.send(f'You fucked up your roll, {ctx.author}: {e}')
+        else:
+            if member is None:
+                await ctx.author.send(roll.msg())
+            else:
+                await member.send(roll.msg())
 
     @bot.command(name='zhist', help='Display roll history.')
     async def zardoz_history(ctx, max_elems: typing.Optional[int] = -1):
@@ -183,6 +168,14 @@ def main():
             await ctx.send('\n'.join(result))
         else:
             await ctx.send('**No variables set.**')
+
+    @bot.group(name='ztest')
+    async def zardoz_test(ctx, arg):
+        await ctx.send(f'parent: {arg}')
+
+    @zardoz_test.command(name='subcmd')
+    async def zardoz_test_subcmd(ctx, *extra_args):
+        await ctx.send(f'subcmd: {extra_args}')
 
 
     bot.run(TOKEN)

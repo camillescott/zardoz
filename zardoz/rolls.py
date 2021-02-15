@@ -18,81 +18,139 @@ def split_operators(word):
     return [t for t in re.split(f'({SPLIT_PAT})', word) if t not in ' ()']
 
 
-def resolve_expr(roll, *args, mode = None, variables={}):
+def tokenize_roll(cmd):
+    raw = []
+    for arg in cmd:
+        raw.extend(split_operators(arg))
+    raw = [token.strip() for token in raw]
+
+    tokens, tag = [], ''
+    for i, token in enumerate(raw):
+        if token.startswith('#'):
+            tokens = raw[:i]
+            tag = ' '.join(raw[i:])
+            break
+    if not tag:
+        tokens = raw
+    tag = tag.strip('# ')
+
+    return tokens, tag
+
+
+def expand_tokens(tokens, mode = None, variables = {}):
+    
+    if mode is None:
+        mode = GameMode.DEFAULT
 
     if mode is not None and not isinstance(mode, GameMode):
         raise ValueError('mode must be of type GameMode')
 
-    # first, do split on roll to seperate operators if lacking whitespace
-    # we want to handle + and - ourselves rather than leaving it to Dice
-    tokens = split_operators(roll)
-    for arg in args:
-        tokens.extend(split_operators(arg))
-   
-    sanitized = []
+    expanded = []
 
     for token in tokens:
         if token.isnumeric():
-            sanitized.append(token)
+            expanded.append(token)
         elif token in DELIMS:
-            sanitized.append(token)
+            expanded.append(token)
         elif token.startswith('$'):
             var = token.strip('$')
             if var in variables:
-                sanitized.append(variables[var])
+                val = variables[var]
+                if not isinstance(val, int):
+                    raise ValueError('Non-integer variable!')
+                expanded.append(variables[var])
+            else:
+                log.error(f'Undefined var: {var}')
+                raise ValueError(f'Sorry bruh, that variable isn\'t defined: {var}')
         else:
-            if mode is not None and token == 'r':
+            if token == 'r':
                 token = MODE_DICE[mode]
 
             ndice = re.match(r'^\d+', token)
             if ndice is not None and int(ndice.group(0)) > 69:
                 log.error(f'Too many dice.')
-                raise RuntimeError('Too many dice.')
+                raise ValueError(f'Woah there cowboy, you trying to crash me? Try using 69 or less dice.')
             try:
                 resolved = dice.roll(token)
             except DiceException:
-                log.warning(f'Got invalid token: {token}.')
-                raise ValueError(f'Invalid expression! Tokens should be rolls, operators, or integers. Got: {token}.')
+                log.error(f'Got invalid token: {token}.')
+                raise ValueError(f'That roll doesn\'t work: {token}.')
             else:
-                sanitized.append(RollList(token, resolved))
+                expanded.append(RollList(token, resolved))
 
-    resolved = ' '.join((str(token) for token in sanitized))
-
-    return sanitized, resolved
+    return expanded
 
 
-def solve_expr(tokens):
-    solved = eval(' '.join([(repr(t) if not isinstance(t, str) else t) for t in tokens]))
-    return solved
-
-
-async def handle_roll(ctx, log, db, game_mode, *args):
-    log.info(f'Received expr: "{args}" from {ctx.guild}:{ctx.author}')
-
-    roll_expr, tag = [], ''
-    for i, token in enumerate(args):
-        if token.startswith('#'):
-            roll_expr = args[:i]
-            tag = ' '.join(args[i:])
-            break
-    if not tag:
-        roll_expr = args
-    tag = tag.strip('# ')
-
+def evaluate_expr(expanded_tokens):
     try:
+        return eval(' '.join([(repr(t) if not isinstance(t, str) else t) for t in expanded_tokens]))
+    except SyntaxError:
+        raise ValueError('Your syntax was scintillating, but I couldn\'t parse it.')
+
+
+class RollHandler:
+
+    def __init__(self, ctx, log, db, roll, require_tag=False):
+        self.ctx = ctx
+        self.log = log
+        self.db = db
+        self.game_mode = db.get_guild_mode(ctx.guild)
+
         variables = db.get_guild_vars(ctx.guild)
-        tokens, resolved = resolve_expr(*roll_expr, mode=game_mode, variables=variables)
-        solved = solve_expr(tokens)
-    except ValueError  as e:
-        log.error(f'Invalid expression: {roll_expr} {e}.')
-        await ctx.send(f'You fucked up yer roll, {ctx.author}.')
-        return None, None, None, None
-    except RuntimeError as e:
-        await ctx.send(f'Woah there cowboy, you trying to crash me? Try using 69 or less dice.')
-        return None, None, None, None
-    else:
-        db.add_roll(ctx.guild, ctx.author, ' '.join(roll_expr), resolved)
-        return tag, roll_expr, resolved, solved
+        self.roll = roll
+        self.tokens, self.tag = tokenize_roll(roll)
+        if require_tag and not self.tag:
+            raise ValueError('Add a tag, it\'s the polite thing to do.')
+
+        self.expanded = expand_tokens(self.tokens,
+                                      mode = self.game_mode,
+                                      variables = variables)
+        self.expr =  ' '.join((str(token) for token in self.expanded))
+        self.result = evaluate_expr(self.expanded)
+        db.add_roll(ctx.guild, ctx.author, ' '.join(self.tokens), self.expr)
+        log.info(str(self))
+
+    def msg(self):
+        header = f'{self.ctx.author.mention}' + (f', *{self.tag}*' if self.tag else '')
+        result = [f'*Request:*\n```{" ".join(self.tokens)}```',
+                  f'*Rolled out:*\n```{self.expr}```',
+                  f'*Result:*\n```{self.result.describe(mode=self.game_mode)}```']
+        result = ''.join(result)
+        msg = '\n'.join((header, result))
+
+        return msg
+
+    def __str__(self):
+        ret = f'<RollHander\n'\
+              f'    cmd: {self.roll}\n'\
+              f'    from: {self.ctx.author}\n'\
+              f'    guild: {self.ctx.guild}\n'\
+              f'    tokens: {self.tokens}\n'\
+              f'    tag: {self.tag}\n'\
+              f'    expanded: {self.expanded}\n'\
+              f'    result: {self.result}'
+        return ret
+
+
+class QuietRollHandler(RollHandler):
+
+    def msg(self):
+        header = f'**{self.ctx.author.mention}**' + (f', *{self.tag}*' if self.tag else '')
+        result =f'```{self.result.describe(mode=self.game_mode)}```'
+        msg = f'{header}\n{result}'
+
+        return msg
+
+
+class SekretRollHandler(RollHandler):
+
+    def msg(self):
+        header = f'from **{self.ctx.author}**: ' + (f'*{self.tag}*' if self.tag else '')
+        result = [f'*Request:*\n```{" ".join(self.tokens)}```',
+                  f'*Rolled out:*\n```{self.expr}```',
+                  f'*Result:*\n```{self.result.describe(mode=self.game_mode)}```']
+        result = ''.join(result)
+        return '\n'.join((header, result))
 
 
 class RollList:
