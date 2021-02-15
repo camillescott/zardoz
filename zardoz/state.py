@@ -42,6 +42,7 @@ class Database:
                            'guild_name': guild.name,
                            'member_id': member.id,
                            'member_nick': member.nick,
+                           'member_name': member.name,
                            'expr': expr,
                            'result': result})
 
@@ -81,6 +82,9 @@ class Database:
         else:
             return None
 
+    def del_var(self, guild, var):
+        self.vars.remove((where('guild_id') == guild.id) & (where('var') == var))
+
     def get_guild_vars(self, guild):
         result = self.vars.search(where('guild_id') == guild.id)
         variables = {row['var']: row['val'] for row in result}
@@ -96,28 +100,3 @@ class ModeConvert(commands.Converter):
             raise commands.BadArgument(f'{argument} is not a valid mode.')
         return converted
 
-
-class VarCommand(commands.Converter):
-
-    CMDS = ['set', 'get', 'list']
-
-    async def convert(self, ctx, argument):
-        if argument not in VarCommand.CMDS:
-            raise commands.BadArgument(f'sub_cmd must be one of {VarCommand.CMDS}')
-
-        async def var_func(db, var, val = 0):
-            if var is None or argument == 'list':
-                variables = db.get_guild_vars(ctx.guild)
-                if variables:
-                    result = [f'**{key}**: {val}' for key, val in variables.items()]
-                    await ctx.send('\n'.join(result))
-                else:
-                    await ctx.send('**No variables set.**')
-            if argument == 'set':
-                db.set_var(ctx.guild, var, val)
-                await ctx.send(f'**{var}** = {val}')
-            if argument == 'get':
-                val = db.get_var(ctx.guild, var)
-                await ctx.send(f'**{var}** = {val}')
-
-        return var_func

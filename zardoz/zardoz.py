@@ -13,7 +13,7 @@ import logging
 import sys
 import typing
 
-from .state import Database, GameMode, ModeConvert, MODE_META, VarCommand
+from .state import Database, GameMode, ModeConvert, MODE_META
 from .rolls import resolve_expr, solve_expr, RollList, DiceDelta, handle_roll
 
 
@@ -50,6 +50,7 @@ def main():
     @bot.event
     async def on_ready():
         log.info(f'Ready: member of {bot.guilds}')
+        log.info(f'Users: {bot.users}')
         DB.add_guilds(bot.guilds)
 
     @bot.command(name='z', help='Evaluate a dice roll.')
@@ -60,17 +61,10 @@ def main():
         if not solved:
             return
 
-        user = ctx.author
-
-        if isinstance(solved, DiceDelta):
-            roll_desc = solved.describe(mode = game_mode)
-        else:
-            roll_desc = list(solved)
-
-        header = f'{user.mention}' + (f', *{tag}*' if tag else '')
+        header = f'{ctx.author.mention}' + (f', *{tag}*' if tag else '')
         result = [f'*Request:*\n```{" ".join(roll_expr)}```',
                   f'*Rolled out:*\n```{resolved}```',
-                  f'*Result:*\n```{roll_desc}```']
+                  f'*Result:*\n```{solved.describe(mode=game_mode)}```']
         result = ''.join(result)
         msg = '\n'.join((header, result))
 
@@ -84,15 +78,8 @@ def main():
         if not solved:
             return
 
-        user = ctx.author
-
-        if isinstance(solved, DiceDelta):
-            roll_desc = solved.describe(mode = game_mode)
-        else:
-            roll_desc = list(solved)
-
-        header = f'**{user.mention}**' + (f', *{tag}*' if tag else '')
-        result =f'```{roll_desc}```'
+        header = f'**{ctx.author.mention}**' + (f', *{tag}*' if tag else '')
+        result =f'```{solved.describe(mode=game_mode)}```'
         msg = f'{header}\n{result}'
 
         await ctx.send(msg)
@@ -105,21 +92,15 @@ def main():
         if not solved:
             return
 
-        user = ctx.author
-
-        if isinstance(solved, DiceDelta):
-            roll_desc = solved.describe(mode = game_mode)
-        else:
-            roll_desc = list(solved)
-
-        header = f'from **{user}**: ' + (f'*{tag}*' if tag else '')
+        header = f'from **{ctx.author}**: ' + (f'*{tag}*' if tag else '')
         result = [f'*Request:*\n```{" ".join(roll_expr)}```',
                   f'*Rolled out:*\n```{resolved}```',
-                  f'*Result:*\n```{roll_desc}```']
+                  f'*Result:*\n```{solved.descibe(mode=game_mode)}```']
         result = ''.join(result)
         msg = '\n'.join((header, result))
 
         await member.send(msg)
+
 
     @bot.command(name='zhist', help='Display roll history.')
     async def zardoz_history(ctx, max_elems: typing.Optional[int] = -1):
@@ -128,17 +109,26 @@ def main():
         guild_hist = DB.query_guild_rolls(ctx.guild)
         if max_elems > 0:
             guild_hist = guild_hist[-max_elems:]
-        guild_hist = '\n'.join((f'{item["member_nick"]}: {item["expr"]} ⟿  {item["result"]}' for item in guild_hist))
+
+        records = []
+        for row in guild_hist:
+            name = row.get('member_nick', None)
+            if name is None:
+                name = row.get('member_name', row.get('member_nick', 'Unknown'))
+            records.append(f'{name}: {row["expr"]} ⟿  {row["result"]}')
+
+        guild_hist = '\n'.join(records)
         await ctx.send(f'Roll History:\n{guild_hist}')
 
     #
     # Mode subcommands
     #
 
-    @bot.group(name='zmode', help='Set the game mode for the server')
+    @bot.group(name='zmode', help='Manage game modes for the server')
     async def zardoz_mode(ctx):
         if ctx.invoked_subcommand is None:
             pass
+        log.info('CMD zmode')
     
     @zardoz_mode.command(name='set', help='Set the mode for the server.')
     async def zardoz_mode_set(ctx, mode: typing.Optional[ModeConvert]):
@@ -162,11 +152,37 @@ def main():
     # Variable subcommands
     #
 
-    @bot.command(name='zvar', help='Set a variable for the server')
-    async def zardoz_var(ctx, sub_cmd: VarCommand,
-                              var: typing.Optional[str],
-                              val: typing.Optional[int] = 0):
-        await sub_cmd(DB, var, val = val)
+    @bot.group(name='zvar', help='Manage variables for the server.')
+    async def zardoz_var(ctx):
+        if ctx.invoked_subcommand is None:
+            pass
+
+    @zardoz_var.command(name='set', help='Set variables for the server.')
+    async def zardoz_var_set(ctx, var: str, val: int):
+        DB.set_var(ctx.guild, var, val)
+        await ctx.send(f'**{var}** = {val}')
+
+    @zardoz_var.command(name='get', help='Print a variable value.')
+    async def zardoz_var_get(ctx, var: str):
+        val = DB.get_var(ctx.guild, var)
+        if val is None:
+            await ctx.send(f'**{var}** is not defined.')
+        else:
+            await ctx.send(f'**{var}** = {val}')
+
+    @zardoz_var.command(name='del', help='Delete a variable.')
+    async def zardoz_var_del(ctx, var: str):
+        DB.del_var(ctx.guild, var)
+        await ctx.send(f'**{var}** deleted')
+
+    @zardoz_var.command(name='list', help='Print current variables.')
+    async def zardoz_var_list(ctx):
+        variables = DB.get_guild_vars(ctx.guild)
+        if variables:
+            result = [f'**{key}**: {val}' for key, val in variables.items()]
+            await ctx.send('\n'.join(result))
+        else:
+            await ctx.send('**No variables set.**')
 
 
     bot.run(TOKEN)

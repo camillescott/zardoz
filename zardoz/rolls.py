@@ -32,7 +32,9 @@ def resolve_expr(roll, *args, mode = None, variables={}):
     sanitized = []
 
     for token in tokens:
-        if token in DELIMS or token.isnumeric():
+        if token.isnumeric():
+            sanitized.append(token)
+        elif token in DELIMS:
             sanitized.append(token)
         elif token.startswith('$'):
             var = token.strip('$')
@@ -101,6 +103,9 @@ class RollList:
             self.roll = [roll]
         else:
             self.roll = list(roll)
+
+    def describe(self, **kwargs):
+        return ', '.join((str(r) for r in self.roll))
 
     def __iter__(self):
         for r in self.roll:
