@@ -24,7 +24,7 @@ from .zvars import VarCommands
 
 class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
                       argparse.RawDescriptionHelpFormatter):
-        pass
+    pass
 
 
 def main():
