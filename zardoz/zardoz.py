@@ -2,12 +2,14 @@ import dice
 
 import discord
 from discord.ext import commands
+from xdg import xdg_data_home
 
 import argparse
 import json
+from pathlib import Path
 import sys
 
-from .logging import LoggingMixin
+from .logging import setup as setup_logger
 from .state import Database
 
 from .zcrit import CritCommands
@@ -21,10 +23,20 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--auth', default='auth.json')
-    parser.add_argument('--database', default='db.json')
+
+    parser.add_argument(
+        '--database',
+        type=lambda p: Path(p).absolute(),
+        default=xdg_data_home().joinpath('zardoz-bot', 'db.json')
+    )
+    parser.add_argument(
+        '--log-file',
+        type=lambda p: Path(p).absolute(),
+        default=xdg_data_home().joinpath('zardoz-bot', 'bot.log')
+    )
     args = parser.parse_args()
 
-    log = LoggingMixin.get_logger()
+    log = setup_logger(log_file=args.log_file)
 
     # parse authentication data
     with open(args.auth) as fp:
@@ -38,6 +50,7 @@ def main():
         log.info(f'TOKEN: {TOKEN}')
 
     # get a handle for the history database
+    args.database.parent.mkdir(exist_ok=True)
     DB = Database(args.database)
 
 

@@ -3,11 +3,18 @@ import logging
 from rich.logging import RichHandler
 
 
-# Set up rich logging handler
-# (discord.py uses the python logger)
-logging.basicConfig(
-    level=logging.INFO, format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
-)
+def setup(log_file):
+    logging.basicConfig(
+        filename=log_file,
+        level=logging.INFO,
+        format='%(asctime)s \t %(levelname)s \t %(message)s',
+        #datefmt="[%X]"
+    )
+
+    logger = logging.getLogger()
+    logger.addHandler(RichHandler())
+
+    return logger
 
 
 class LoggingMixin:
@@ -24,4 +31,4 @@ class LoggingMixin:
 
     @staticmethod
     def get_logger():
-        return logging.getLogger('discord')
+        return logging.getLogger()

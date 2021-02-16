@@ -125,7 +125,7 @@ class RollHandler:
             raise ValueError(f'Your syntax was scintillating, but I couldn\'t parse it.')
 
         db.add_roll(ctx.guild, ctx.author, ' '.join(self.tokens), self.expr)
-        log.info(str(self))
+        log.info(f'Handled roll: {str(self)}')
 
     def msg(self):
         header = f':game_die: {self.ctx.author.mention}' + (f': *{self.tag}*' if self.tag else '')
@@ -138,14 +138,14 @@ class RollHandler:
         return msg
 
     def __str__(self):
-        ret = f'<RollHander\n'\
-              f'    cmd: {self.roll}\n'\
-              f'    from: {self.ctx.author}\n'\
-              f'    guild: {self.ctx.guild}\n'\
-              f'    tokens: {self.tokens}\n'\
-              f'    tag: {self.tag}\n'\
-              f'    expanded: {self.expanded}\n'\
-              f'    result: {self.result}'
+        ret = f'<RollHander'\
+              f' cmd="{self.roll}"'\
+              f' from={self.ctx.author}'\
+              f' guild={self.ctx.guild}'\
+              f' tokens={self.tokens}'\
+              f' tag="{self.tag}"'\
+              f' expanded={self.expanded}'\
+              f' result={self.result}>'
         return ret
 
 

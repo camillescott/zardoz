@@ -14,7 +14,8 @@ requirements = ['discord.py',
                 'rich',
                 'dice',
                 'tinydb',
-                'pyyaml']
+                'pyyaml',
+                'xdg']
 
 setup_requirements = ['pytest-runner', ]
 
