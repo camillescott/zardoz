@@ -13,7 +13,8 @@ with open('HISTORY.rst') as history_file:
 requirements = ['discord.py',
                 'rich',
                 'dice',
-                'tinydb']
+                'tinydb',
+                'pyyaml']
 
 setup_requirements = ['pytest-runner', ]
 
@@ -22,7 +23,7 @@ test_requirements = ['pytest>=3', ]
 setup(
     author="Camille Scott",
     author_email='cswel@ucdavis.edu',
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     entry_points={
         'console_scripts': [
             'zardoz = zardoz:main'
@@ -51,6 +52,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/camillescott/zardoz',
-    version='0.1.0',
+    version='0.2.1',
     zip_safe=False,
 )
