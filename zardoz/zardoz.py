@@ -14,6 +14,7 @@ import sys
 import typing
 
 from .crit import load_crit_tables
+from .history import HistoryCommands
 from .state import Database, GameMode, ModeConvert, MODE_META
 from .rolls import (RollHandler, QuietRollHandler, SekretRollHandler,
                     RollList, DiceDelta)
@@ -91,24 +92,6 @@ def main():
             await ctx.author.send(f'You fucked up your roll, {ctx.author}. {e}')
         else:
             await member.send(roll.msg())
-
-    @bot.command(name='zhist', help='Display roll history.')
-    async def zardoz_history(ctx, max_elems: typing.Optional[int] = -1):
-        log.info(f'CMD zhist {max_elems}.')
-
-        guild_hist = DB.query_guild_rolls(ctx.guild)
-        if max_elems > 0:
-            guild_hist = guild_hist[-max_elems:]
-
-        records = []
-        for row in guild_hist:
-            name = row.get('member_nick', None)
-            if name is None:
-                name = row.get('member_name', row.get('member_nick', 'Unknown'))
-            records.append(f'{name}: {row["expr"]} ⟿  {row["result"]}')
-
-        guild_hist = '\n'.join(records)
-        await ctx.send(f'Roll History:\n{guild_hist}')
 
     #
     # Mode subcommands
@@ -211,6 +194,8 @@ def main():
     @zardoz_test.command(name='subcmd')
     async def zardoz_test_subcmd(ctx, *extra_args):
         await ctx.send(f'subcmd: {extra_args}')
+
+    bot.add_cog(HistoryCommands(bot, DB))
 
 
     bot.run(TOKEN)
