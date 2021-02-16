@@ -3,7 +3,17 @@ import typing
 from discord.ext import commands
 
 from .logging import LoggingMixin
-from .state import GameMode, MODE_META, ModeConvert
+from .state import GameMode, MODE_META
+
+
+class ModeConvert(commands.Converter):
+
+    async def convert(self, ctx, argument):
+        try:
+            converted = GameMode[argument]
+        except KeyError:
+            raise commands.BadArgument(f'{argument} is not a valid mode.')
+        return converted
 
 
 class ModeCommands(commands.Cog, LoggingMixin):
@@ -36,3 +46,4 @@ class ModeCommands(commands.Cog, LoggingMixin):
     async def zardoz_mode_list(self, ctx):
         modes = '\n'.join((f'{mode.name}: {MODE_META[mode]}' for mode in GameMode))
         await ctx.send(modes)
+

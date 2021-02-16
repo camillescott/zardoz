@@ -90,13 +90,3 @@ class Database:
         variables = {row['var']: row['val'] for row in result}
         return variables
 
-
-class ModeConvert(commands.Converter):
-
-    async def convert(self, ctx, argument):
-        try:
-            converted = GameMode[argument]
-        except KeyError:
-            raise commands.BadArgument(f'{argument} is not a valid mode.')
-        return converted
-
