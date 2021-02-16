@@ -13,7 +13,7 @@ logging.basicConfig(
 class LoggingMixin:
 
     def __init__(self, *args, **kwargs):
-        self.log = logging.getLogger('discord')
+        self.log = self.get_logger()
         self.register_decos()
         
     def register_decos(self):
@@ -21,3 +21,7 @@ class LoggingMixin:
         @self.bot.before_invoke
         async def log_cmd_invoke(ctx):
             self.log.info(f'CMD: [{ctx.invoked_with} {ctx.message.content}] from {ctx.author}:{ctx.guild}')
+
+    @staticmethod
+    def get_logger():
+        return logging.getLogger('discord')
