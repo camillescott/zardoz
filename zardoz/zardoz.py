@@ -58,7 +58,7 @@ def main():
         DB.add_guilds(bot.guilds)
 
     @bot.command(name='z', help='Evaluate a dice roll.')
-    async def zardoz_roll(ctx, *args):
+    async def zardoz_roll(ctx, *, args):
 
         try:
             roll = RollHandler(ctx, log, DB, args)
@@ -69,7 +69,7 @@ def main():
             await ctx.message.reply(roll.msg())
 
     @bot.command(name='zq', help='Evaluate a dice roll, quietly.')
-    async def zardoz_quiet_roll(ctx, *args):
+    async def zardoz_quiet_roll(ctx, *, args):
 
         try:
             roll = QuietRollHandler(ctx, log, DB, args)
@@ -80,7 +80,7 @@ def main():
             await ctx.message.reply(roll.msg())
 
     @bot.command(name='zs', help='Make a secret roll and DM to member.')
-    async def zardoz_secret_roll(ctx, member: typing.Optional[discord.Member], *args):
+    async def zardoz_secret_roll(ctx, member: typing.Optional[discord.Member], *, args):
         if member is None:
             member = ctx.author
 

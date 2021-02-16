@@ -10,7 +10,7 @@ from .state import GameMode, MODE_DICE
 log = logging.getLogger('discord')
 
 
-DELIMS = ['+', '-', '<=', '<', '>=', '>', '(', ')', '#']
+DELIMS = ['+', '-', '<=', '<', '>=', '>', '(', ')', '#', '\s']
 SPLIT_PAT = '|'.join(map(re.escape, DELIMS))
 
 
@@ -19,9 +19,15 @@ def split_operators(word):
 
 
 def tokenize_roll(cmd):
+
     raw = []
-    for arg in cmd:
-        raw.extend(split_operators(arg))
+
+    if isinstance(cmd, str):
+        raw = split_operators(cmd)
+    else:
+        for arg in cmd:
+            raw.extend(split_operators(arg))
+
     raw = [token.strip() for token in raw]
 
     tokens, tag = [], ''
@@ -61,7 +67,7 @@ def expand_tokens(tokens, mode = None, variables = {}):
                 expanded.append(variables[var])
             else:
                 log.error(f'Undefined var: {var}')
-                raise ValueError(f'Sorry bruh, that variable isn\'t defined: {var}')
+                raise ValueError(f'Sorry bruh, that variable isn\'t defined: `{var}`')
         else:
             if token == 'r':
                 token = MODE_DICE[mode]
@@ -74,7 +80,7 @@ def expand_tokens(tokens, mode = None, variables = {}):
                 resolved = dice.roll(token)
             except DiceException:
                 log.error(f'Got invalid token: {token}.')
-                raise ValueError(f'I don\'t like this argument: {token}.')
+                raise ValueError(f'I don\'t like this argument: `{token}`.')
             else:
                 expanded.append(RollList(token, resolved))
 
