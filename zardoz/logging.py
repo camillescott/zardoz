@@ -7,8 +7,8 @@ def setup(log_file):
     logging.basicConfig(
         filename=log_file,
         level=logging.INFO,
-        format='%(asctime)s \t %(levelname)s \t %(message)s',
-        #datefmt="[%X]"
+        format='%(asctime)s %(levelname)10s [%(filename)s:%(lineno)s - %(funcName)20s()] %(message)s',
+        datefmt="[%x %X]"
     )
 
     logger = logging.getLogger()
