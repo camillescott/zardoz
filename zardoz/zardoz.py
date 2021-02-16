@@ -14,7 +14,8 @@ import sys
 import typing
 
 from .crit import load_crit_tables
-from .history import HistoryCommands
+from .zhistory import HistoryCommands
+from .zvars import VarCommands
 from .state import Database, GameMode, ModeConvert, MODE_META
 from .rolls import (RollHandler, QuietRollHandler, SekretRollHandler,
                     RollList, DiceDelta)
@@ -122,42 +123,6 @@ def main():
         await ctx.send(modes)
 
     #
-    # Variable subcommands
-    #
-
-    @bot.group(name='zvar', help='Manage variables for the server.')
-    async def zardoz_var(ctx):
-        if ctx.invoked_subcommand is None:
-            pass
-
-    @zardoz_var.command(name='set', help='Set variables for the server.')
-    async def zardoz_var_set(ctx, var: str, val: int):
-        DB.set_var(ctx.guild, var, val)
-        await ctx.send(f'**{var}** = {val}')
-
-    @zardoz_var.command(name='get', help='Print a variable value.')
-    async def zardoz_var_get(ctx, var: str):
-        val = DB.get_var(ctx.guild, var)
-        if val is None:
-            await ctx.send(f'**{var}** is not defined.')
-        else:
-            await ctx.send(f'**{var}** = {val}')
-
-    @zardoz_var.command(name='del', help='Delete a variable.')
-    async def zardoz_var_del(ctx, var: str):
-        DB.del_var(ctx.guild, var)
-        await ctx.send(f'**{var}** deleted')
-
-    @zardoz_var.command(name='list', help='Print current variables.')
-    async def zardoz_var_list(ctx):
-        variables = DB.get_guild_vars(ctx.guild)
-        if variables:
-            result = [f'**{key}**: {val}' for key, val in variables.items()]
-            await ctx.send('\n'.join(result))
-        else:
-            await ctx.send('**No variables set.**')
-
-    #
     # Crit table subcommands
     #
 
@@ -195,6 +160,7 @@ def main():
     async def zardoz_test_subcmd(ctx, *extra_args):
         await ctx.send(f'subcmd: {extra_args}')
 
+    bot.add_cog(VarCommands(bot, DB))
     bot.add_cog(HistoryCommands(bot, DB))
 
 
