@@ -13,7 +13,7 @@ import logging
 import sys
 import typing
 
-from .crit import load_crit_tables
+from .zcrit import CritCommands
 from .zhistory import HistoryCommands
 from .zvars import VarCommands
 from .state import Database, GameMode, ModeConvert, MODE_META
@@ -48,8 +48,7 @@ def main():
 
     # get a handle for the history database
     DB = Database(args.database)
-    CRITS = load_crit_tables(log)
-    log.info(f'Loaded crits: {CRITS}')
+
 
     bot = commands.Bot(command_prefix='/')
 
@@ -126,40 +125,9 @@ def main():
     # Crit table subcommands
     #
 
-    @bot.group(name='zcrit')
-    async def zardoz_crit(ctx):
-        pass
 
-    @zardoz_crit.command(name='r')
-    async def zardoz_crit_roll(ctx, table_name: str, val: typing.Optional[int]):
-        try:
-            table = CRITS[table_name]
-        except KeyError:
-            log.error(f'Error: no such crit: {table_name}.')
-            await ctx.message.reply(f'No crit table named {table_name}.')
-        else:
-            try:
-                if val is None:
-                    val, name, effect = table.roll()
-                else:
-                    name, effect = table.get(val)
-            except ValueError:
-                await ctx.message.reply(f'Bad crit table value. Perils be upon ye.')
-            else:
-                msg = f'**Result:** {table.die} ⤳ {val}\n'\
-                      f'**Table:** {table.full_name} ({table.game}, {table.book})\n'\
-                      f'**Name:** {name}\n'\
-                      f'**Effect:** {effect}'
-                await ctx.message.reply(msg)
 
-    @bot.group(name='ztest')
-    async def zardoz_test(ctx, arg):
-        await ctx.send(f'parent: {arg}')
-
-    @zardoz_test.command(name='subcmd')
-    async def zardoz_test_subcmd(ctx, *extra_args):
-        await ctx.send(f'subcmd: {extra_args}')
-
+    bot.add_cog(CritCommands(bot, DB))
     bot.add_cog(VarCommands(bot, DB))
     bot.add_cog(HistoryCommands(bot, DB))
 
