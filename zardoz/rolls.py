@@ -1,5 +1,6 @@
 import dice
 from dice import DiceException
+from discord.ext import commands
 
 import logging
 import re
@@ -254,4 +255,22 @@ class DiceDelta:
         return '\n'.join(desc)
 
 
+class SimpleRollConvert(commands.Converter):
+
+    pat = r'^\d+d\d+t?$'
+
+    async def convert(self, ctx, argument):
+        match = re.match(pat, argument)
+        if match is None:
+            raise commands.BadArgument(f'{argument} is not a simple roll.')
+        try:
+            roll = dice.roll(argument)
+        except:
+            raise commands.BadArgument(f'Failed to parse roll: {argument}')
+        else:
+            log.info(f'SimpleRoll: {argument} ⤳ {roll}')
+            if isinstance(roll, int):
+                return roll
+            else:
+                return sum(roll)
 
