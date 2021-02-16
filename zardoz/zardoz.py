@@ -72,14 +72,22 @@ def main():
     args.database.parent.mkdir(exist_ok=True)
     DB = Database(args.database)
 
-
     bot = commands.Bot(command_prefix='/')
+
 
     @bot.event
     async def on_ready():
         log.info(f'Ready: member of {bot.guilds}')
         log.info(f'Users: {bot.users}')
         DB.add_guilds(bot.guilds)
+
+    @bot.command(name='zabout', help='Project info.')
+    async def zabout(ctx):
+        msg = f'version: {__version__}\n'\
+              f'source: https://github.com/camillescott/zardoz\n'\
+              f'active installs: {len(bot.guilds)}'
+        await ctx.message.reply(msg)
+        
 
     bot.add_cog(RollCommands(bot, DB))
     bot.add_cog(CritCommands(bot, DB))
