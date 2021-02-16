@@ -1,0 +1,56 @@
+full_name: Energy Critical Effects - Body
+slug: rt_en_body
+game: RT
+book: Core.252
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      A blow to the target’s body steals a breath from his lungs. The target can take only a Half Action on his next Turn.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The blast punches the air from the target’s body, inflicting 1 level of Fatigue upon him.
+  - range: [3, 3]
+    name:
+    effect: |
+      The attack cooks the flesh on the hest and abdomen, inflicting 2 levels of Fatigue and leaving the target Stunned for 1 Round.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The energy ripples all over the character, scorching his body and inflicting 1d10 levels of Fatigue.
+  - range: [5, 5]
+    name: 
+    effect: |
+      The fury of the attack forces the target to the ground, helplessly covering his face and keening in agony. The target is
+      knocked to the ground and must make an Agility Test or catch fire (see Special Damage). The target takes 1d5 levels of
+      Fatigue and must take the Stand Action to regain his feet.
+  - range: [6, 6]
+    name:
+    effect: |
+      Struck by the full force of the attack, the target is sent reeling to the ground, smoke spiralling out of the wound. The
+      target is knocked to the ground, Stunned for 1d10 Rounds, and takes 1d5 levels of Fatigue. In addition, he must make
+      an Agility Test or catch fire (see Special Damage on page 210).
+  - range: [7, 7]
+    name: 
+    effect: |
+      The intense power of the energy attack cooks the target’s organs, burning his lungs and heart with intense heat. The
+      target is Stunned for 2d10 Rounds and reduces his Toughness by half (round down).
+  - range: [8, 8]
+    name:
+    effect: |
+      As the attack washes over the target, his skin turns black and peels off while body fat seeps out of his clothing and
+      armour. The target is Stunned for 2d10 Rounds and the attack halves his Strength, Toughness and Agility. The
+      extensive scarring permanently halves the target’s Fellowship characteristic.
+  - range: [9, 9]
+    name:
+    effect: |
+      The target is completely encased in fire, melting his skin and popping his eyes like superheated eggs. He falls to the
+      ground a blackened corpse.
+  - range: [10,1000]
+    name:
+    effect: | 
+      Same as (9), except in addition, if the target is carrying any ammunition, there is a 50% chance it explodes. Unless they
+      can make a successful Dodge Test, all creatures within 1d5 metres take 1d10+5 Explosive Damage. If the target carried
+      any grenades or missiles, one round after the Damage was dealt they detonate where the target’s body lies with the
