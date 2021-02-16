@@ -1,6 +1,6 @@
 __author__ = """Camille Scott"""
 __email__ = 'cswel@ucdavis.edu'
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 __splash__ = f'''
  _____             _      _____
 |__  /__ _ _ __ __| | ___|__  /
