@@ -8,7 +8,7 @@ import yaml
 from discord.ext import commands
 
 from .logging import LoggingMixin
-
+from .utils import __pkg_dir__
 
 class CritCommands(commands.Cog, LoggingMixin):
 
@@ -48,11 +48,8 @@ class CritCommands(commands.Cog, LoggingMixin):
 
 
 def load_crit_tables(log=None):
-    __path__ = os.path.abspath(os.path.dirname(__file__))
-    if log:
-        log.info(f'Base dir: {__path__}')
     
-    files = glob.glob(os.path.join(__path__, 'crits', '*.yaml'))
+    files = glob.glob(os.path.join(__pkg_dir__, 'crits', '*.yaml'))
     tables = {}
     for file_path in files:
         table = CritTable(file_path)
