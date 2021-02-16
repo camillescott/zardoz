@@ -33,8 +33,9 @@ class CritTable:
     def get(self, roll):
         for option in self.rolls:
             lower, upper = option['range']
+            name = '' if not option['name'] else option['name'].strip()
             if lower <= roll <= upper:
-                return option['name'].strip(), option['effect'].strip()
+                return name, ' '.join(option['effect'].split())
 
         raise ValueError(f'No entry for {roll}')
 
