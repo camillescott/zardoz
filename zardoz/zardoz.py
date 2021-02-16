@@ -15,8 +15,9 @@ import typing
 
 from .zcrit import CritCommands
 from .zhistory import HistoryCommands
+from .zmode import ModeCommands
 from .zvars import VarCommands
-from .state import Database, GameMode, ModeConvert, MODE_META
+from .state import Database, GameMode
 from .rolls import (RollHandler, QuietRollHandler, SekretRollHandler,
                     RollList, DiceDelta)
 
@@ -93,42 +94,10 @@ def main():
         else:
             await member.send(roll.msg())
 
-    #
-    # Mode subcommands
-    #
-
-    @bot.group(name='zmode', help='Manage game modes for the server')
-    async def zardoz_mode(ctx):
-        if ctx.invoked_subcommand is None:
-            pass
-        log.info('CMD zmode')
-    
-    @zardoz_mode.command(name='set', help='Set the mode for the server.')
-    async def zardoz_mode_set(ctx, mode: typing.Optional[ModeConvert]):
-        if mode is None:
-            mode = GameMode.DEFAULT
-        DB.set_guild_mode(ctx.guild, mode)
-        await ctx.send(f'**Set Mode:**: {GameMode(mode).name}')
-
-    @zardoz_mode.command(name='get', help='Display the server mode.')
-    async def zardoz_mode_get(ctx):
-        current_mode = DB.get_guild_mode(ctx.guild)
-        await ctx.send(f'**Mode:**: {GameMode(current_mode).name}\n'\
-                       f'*{MODE_META[current_mode]}*')
-
-    @zardoz_mode.command(name='list', help='List available modes.')
-    async def zardoz_mode_list(ctx):
-        modes = '\n'.join((f'{mode.name}: {MODE_META[mode]}' for mode in GameMode))
-        await ctx.send(modes)
-
-    #
-    # Crit table subcommands
-    #
-
-
 
     bot.add_cog(CritCommands(bot, DB))
     bot.add_cog(VarCommands(bot, DB))
+    bot.add_cog(ModeCommands(bot, DB))
     bot.add_cog(HistoryCommands(bot, DB))
 
 
