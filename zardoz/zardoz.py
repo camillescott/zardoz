@@ -6,6 +6,7 @@ from xdg import xdg_data_home
 
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -22,8 +23,13 @@ from .zvars import VarCommands
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--auth', default='auth.json')
-
+    parser.add_argument(
+        '--secret-token',
+        help='The secret token for the bot, '\
+             'from the discord developer portal. '\
+             'If you have set ZARDOZ_TOKEN, this '\
+             'option will override that.'
+    )
     parser.add_argument(
         '--database',
         type=lambda p: Path(p).absolute(),
@@ -38,16 +44,15 @@ def main():
 
     log = setup_logger(log_file=args.log_file)
 
-    # parse authentication data
-    with open(args.auth) as fp:
-        auth = json.load(fp)
-    try:
-        TOKEN = auth['token']
-    except:
-        log.error('Must set "token" in auth.json!')
-        sys.exit(1)
-    else:
-        log.info(f'TOKEN: {TOKEN}')
+    TOKEN = args.secret_token
+    if not TOKEN:
+        try:
+            TOKEN = os.environ['ZARDOZ_TOKEN']
+        except KeyError:
+            log.error('Must set ZARDOZ_TOKEN or use --secret-token')
+            sys.exit(1)
+        else:
+            log.info('Got secret token from $ZARDOZ_TOKEN.')
 
     # get a handle for the history database
     args.database.parent.mkdir(exist_ok=True)
