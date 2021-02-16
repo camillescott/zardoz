@@ -9,10 +9,12 @@ import json
 import os
 from pathlib import Path
 import sys
+import textwrap
 
 from .logging import setup as setup_logger
 from .state import Database
 
+from . import __version__, __splash__, __about__
 from .zcrit import CritCommands
 from .zhistory import HistoryCommands
 from .zmode import ModeCommands
@@ -20,29 +22,41 @@ from .zroll import RollCommands
 from .zvars import VarCommands
 
 
+class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
+                      argparse.RawDescriptionHelpFormatter):
+        pass
+
+
 def main():
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=f'{__splash__}\n{__about__}',
+        formatter_class=CustomFormatter
+    )
     parser.add_argument(
         '--secret-token',
         help='The secret token for the bot, '\
              'from the discord developer portal. '\
-             'If you have set ZARDOZ_TOKEN, this '\
+             'If you have set $ZARDOZ_TOKEN, this '\
              'option will override that.'
     )
     parser.add_argument(
         '--database',
         type=lambda p: Path(p).absolute(),
-        default=xdg_data_home().joinpath('zardoz-bot', 'db.json')
+        default=xdg_data_home().joinpath('zardoz-bot', 'db.json'),
+        help='Path to the bot database. Default follows the '\
+             'XDG specifiction.'
     )
     parser.add_argument(
-        '--log-file',
+        '--log',
         type=lambda p: Path(p).absolute(),
-        default=xdg_data_home().joinpath('zardoz-bot', 'bot.log')
+        default=xdg_data_home().joinpath('zardoz-bot', 'bot.log'),
+        help='Path to the log file. Default follows the '\
+             'XDG specifiction.'
     )
     args = parser.parse_args()
 
-    log = setup_logger(log_file=args.log_file)
+    log = setup_logger(log_file=args.log)
 
     TOKEN = args.secret_token
     if not TOKEN:

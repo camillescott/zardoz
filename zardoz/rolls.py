@@ -8,7 +8,7 @@ import re
 from .state import GameMode, MODE_DICE
 
 
-log = logging.getLogger('discord')
+log = logging.getLogger()
 
 
 DELIMS = ['+', '-', '<=', '<', '>=', '>', '(', ')', '#', '\s']
