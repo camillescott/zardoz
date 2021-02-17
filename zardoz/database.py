@@ -29,6 +29,8 @@ class DatabaseCache(LoggingMixin):
 
         super().__init__()
 
+        self.log.info(f'DatabaseCache using dir: {db_dir}')
+
     async def get_guild_db(self, guild_id: int):
         self.log.info(f'Fetch database for {guild_id}')
         db = self.cache.get(guild_id, None)
