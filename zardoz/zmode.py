@@ -2,6 +2,7 @@ import typing
 
 from discord.ext import commands
 
+from .database import fetch_guild_db
 from .logging import LoggingMixin
 from .state import GameMode, MODE_META
 
@@ -30,15 +31,17 @@ class ModeCommands(commands.Cog, LoggingMixin):
             pass
     
     @zmode.command(name='set', help='Set the mode for the server.')
+    @fetch_guild_db
     async def zmode_set(self, ctx, mode: typing.Optional[ModeConvert]):
         if mode is None:
             mode = GameMode.DEFAULT
-        self.db.set_guild_mode(ctx.guild, mode)
+        await ctx.guild_db.set_guild_mode(mode)
         await ctx.send(f'**Set Mode:**: {GameMode(mode).name}')
 
     @zmode.command(name='get', help='Display the server mode.')
+    @fetch_guild_db
     async def zardoz_mode_get(self, ctx):
-        current_mode = self.db.get_guild_mode(ctx.guild)
+        current_mode = await ctx.guild_db.get_guild_mode()
         await ctx.send(f'**Mode:**: {GameMode(current_mode).name}\n'\
                        f'*{MODE_META[current_mode]}*')
 
