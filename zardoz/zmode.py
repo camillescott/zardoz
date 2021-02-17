@@ -26,27 +26,25 @@ class ModeCommands(commands.Cog, LoggingMixin):
         super().__init__()
 
     @commands.group(name='zmode', help='Manage game modes for the server')
-    async def zmode(self, ctx):
-        if ctx.invoked_subcommand is None:
-            pass
-    
-    @zmode.command(name='set', help='Set the mode for the server.')
     @fetch_guild_db
-    async def zmode_set(self, ctx, mode: typing.Optional[ModeConvert]):
+    async def zmode(self, ctx, mode: typing.Optional[ModeConvert]):
+        if ctx.invoked_subcommand is not None:
+            return
+
         if mode is None:
-            mode = GameMode.DEFAULT
-        await ctx.guild_db.set_guild_mode(mode)
-        await ctx.send(f'**Set Mode:** {GameMode(mode).name}')
-
-    @zmode.command(name='get', help='Display the server mode.')
-    @fetch_guild_db
-    async def zardoz_mode_get(self, ctx):
-        current_mode = await ctx.guild_db.get_guild_mode()
-        await ctx.send(f'**Mode:**: {GameMode(current_mode).name}\n'\
-                       f'*{MODE_META[current_mode]}*')
-
+            current_mode = await ctx.guild_db.get_guild_mode()
+            await ctx.send(f'**Mode:**: {GameMode(current_mode).name}\n'\
+                           f'*{MODE_META[current_mode]}*')
+        else:
+            try:
+                await ctx.guild_db.set_guild_mode(mode)
+            except ValueError as e:
+                await ctx.message.reply(f'{e}')
+            else:
+                await ctx.message.reply(f'**Set Mode:** {GameMode(mode).name}')
+    
     @zmode.command(name='list', help='List available modes.')
     async def zardoz_mode_list(self, ctx):
         modes = '\n'.join((f'{mode.name}: {MODE_META[mode]}' for mode in GameMode))
-        await ctx.send(modes)
+        await ctx.message.reply(modes)
 
