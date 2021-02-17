@@ -103,7 +103,9 @@ class ZardozDatabase(LoggingMixin):
     async def get_rolls(self, max_rolls=5, since=None):
         async with self.get_rolls_cursor_cmd(max_rolls=max_rolls) as cur:
             async for row in cur:
-                yield dict(row)
+                result = dict(row)
+                result['time'] = datetime.fromtimestamp(result['time']).astimezone()
+                yield result
 
     async def get_merged_vars(self, member_id: int):
         user_vars = await self.get_user_vars(member_id)
