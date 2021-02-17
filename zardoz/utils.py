@@ -1,7 +1,9 @@
 from datetime import datetime
+import functools
 import os
 from pathlib import Path
 
+import discord
 from xdg import xdg_data_home
 
 
@@ -22,3 +24,16 @@ def default_log_file(debug=False):
     else:
         return xdg_data_home().joinpath('zardoz-bot', 'debug', 'bot.log')
 
+
+def handle_http_exception(func):
+
+    @functools.wraps(func)
+    async def wrapper(self, ctx, *args, **kwargs):
+        try:
+            return await func(self, ctx, *args, **kwargs)
+        except discord.HTTPException:
+            await ctx.message.reply('Hey broh, that\'s a big response.'\
+                                    ' Try dialing back your request,'\
+                                    ' I\'m only human.')
+            raise
+    return wrapper

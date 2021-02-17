@@ -82,7 +82,6 @@ def main():
 
     bot = ZardozBot(command_prefix='/')
 
-
     @bot.event
     async def on_ready():
         log.info(f'Ready: member of {bot.guilds}')
