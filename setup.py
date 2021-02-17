@@ -15,7 +15,10 @@ requirements = ['discord.py',
                 'dice',
                 'tinydb',
                 'pyyaml',
-                'xdg']
+                'xdg',
+                'aiofiles',
+                'aiosql',
+                'aiosqlite']
 
 setup_requirements = ['pytest-runner', ]
 
