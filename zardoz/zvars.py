@@ -30,13 +30,13 @@ class VarCommands(commands.Cog, LoggingMixin):
     @zvar.command(name='set', help='Set variables for the server.')
     @fetch_guild_db
     async def zvar_set(self, ctx, var: str, val: int):
-        await ctx.guild_db.set_guild_var(ctx.member.id, var, val)
+        await ctx.guild_db.set_guild_var(ctx.author.id, var, val)
         await ctx.send(f'**{var}** = {val}')
 
     @zvar.command(name='get', help='Print a variable value.')
     @fetch_guild_db
     async def zvar_get(self, ctx, var: str):
-        val = ctx.guild_db.get_guild_var(var)
+        val = await ctx.guild_db.get_guild_var(var)
         if val is None:
             await ctx.send(f'**{var}** is not defined.')
         else:
@@ -45,5 +45,5 @@ class VarCommands(commands.Cog, LoggingMixin):
     @zvar.command(name='del', help='Delete a variable.')
     @fetch_guild_db
     async def zvar_del(self, ctx, var: str):
-        ctx.guild_db.del_var(ctx.guild, var)
+        await ctx.guild_db.del_guild_var(var)
         await ctx.send(f'**{var}** deleted')

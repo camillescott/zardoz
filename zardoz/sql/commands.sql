@@ -27,7 +27,7 @@ where member_id=:member_id and var=:var;
 -- name: set_guild_var!
 insert into guild_vars
 values (:member_id, :var, :val)
-on conflict (member_id, var)
+on conflict (var)
 do update set member_id=:member_id, val=:val;
 
 -- name: get_guild_var^

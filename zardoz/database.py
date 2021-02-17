@@ -130,7 +130,7 @@ class ZardozDatabase(LoggingMixin):
 
     async def get_guild_var(self, var: str):
         result = await self.get_guild_var_cmd(var=var)
-        return row['val']
+        return result['val']
     
     async def get_guild_vars(self):
         guild_vars = {}
