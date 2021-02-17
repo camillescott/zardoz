@@ -36,7 +36,7 @@ class ModeCommands(commands.Cog, LoggingMixin):
         if mode is None:
             mode = GameMode.DEFAULT
         await ctx.guild_db.set_guild_mode(mode)
-        await ctx.send(f'**Set Mode:**: {GameMode(mode).name}')
+        await ctx.send(f'**Set Mode:** {GameMode(mode).name}')
 
     @zmode.command(name='get', help='Display the server mode.')
     @fetch_guild_db
