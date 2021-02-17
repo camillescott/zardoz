@@ -105,13 +105,19 @@ class ZardozDatabase(LoggingMixin):
             async for row in cur:
                 yield dict(row)
 
+    async def get_merged_vars(self, member_id: int):
+        user_vars = await self.get_user_vars(member_id)
+        guild_vars = await self.get_guild_vars()
+        guild_vars.update(user_vars)
+        return guild_vars
+
     async def set_user_var(self, member_id: int, var: str, val: int):
         await self.set_user_var_cmd(member_id=member_id, var=var, val=val)
         await self.con.commit()
 
     async def get_user_var(self, member_id: int, var: str):
         result = await self.get_user_var_cmd(member_id=member_id, var=var)
-        return row['val']
+        return result['val'] if result else None
     
     async def get_user_vars(self, member_id: int):
         user_vars = {}
@@ -130,7 +136,7 @@ class ZardozDatabase(LoggingMixin):
 
     async def get_guild_var(self, var: str):
         result = await self.get_guild_var_cmd(var=var)
-        return result['val']
+        return result['val'] if result else None
     
     async def get_guild_vars(self):
         guild_vars = {}
@@ -156,7 +162,7 @@ class ZardozDatabase(LoggingMixin):
         if mode:
             return GameMode(mode)
         else:
-            await self.set_guild_mode(GamdeMode.DEFAULT)
+            await self.set_guild_mode(GameMode.DEFAULT)
             return GameMode.DEFAULT
 
 
@@ -165,6 +171,8 @@ def fetch_guild_db(func):
     @functools.wraps(func)
     async def wrapper(self, ctx, *args, **kwargs):
         ctx.guild_db = await self.db.get_guild_db(ctx.guild.id)
+        ctx.game_mode = await ctx.guild_db.get_guild_mode()
+        ctx.variables = await ctx.guild_db.get_merged_vars(ctx.author.id)
         return await func(self, ctx, *args, **kwargs)
 
     return wrapper
