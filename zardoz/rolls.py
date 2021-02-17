@@ -191,7 +191,8 @@ class RollList:
             self.roll = list(roll)
 
     def describe(self, **kwargs):
-        return ', '.join((str(r) for r in self.roll))
+        dsc = ', '.join((str(r) for r in self.roll))
+        return dsc if dsc else '0'
 
     def __iter__(self):
         for r in self.roll:
@@ -263,7 +264,8 @@ class DiceDelta:
             else:
                 kind = 'S by' if pred else 'F by'
                 desc.append(f'{roll:4} ⤳ {kind} {delta}')
-        return '\n'.join(desc)
+        desc = '\n'.join(desc)
+        return desc if desc else '0'
 
 
 class SimpleRollConvert(commands.Converter):
