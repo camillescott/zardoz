@@ -4,6 +4,7 @@ values (:member_id, :member_nick, :member_name, :roll, :tag, :result, :time);
 
 -- name: get_rolls
 select * from rolls
+order by time desc
 limit :max_rolls;
 
 -- name: set_user_var!
