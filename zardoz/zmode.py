@@ -44,7 +44,7 @@ class ModeCommands(commands.Cog, LoggingMixin):
                 await ctx.message.reply(f'**Set Mode:** {GameMode(mode).name}')
     
     @zmode.command(name='list', help='List available modes.')
-    async def zardoz_mode_list(self, ctx):
+    async def zmode_list(self, ctx):
         modes = '\n'.join((f'{mode.name}: {MODE_META[mode]}' for mode in GameMode))
         await ctx.message.reply(modes)
 
