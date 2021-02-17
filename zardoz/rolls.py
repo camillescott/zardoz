@@ -164,7 +164,7 @@ class QuietRollHandler(RollHandler):
 class SekretRollHandler(RollHandler):
 
     def msg(self):
-        header = f'from **{self.ctx.author}** in **{self.ctx.guild}**: ' + (f'*{self.tag}*' if self.tag else '')
+        header = f':game_die: from **{self.ctx.author}** in **{self.ctx.guild}**: ' + (f'*{self.tag}*' if self.tag else '')
         result = [f'*Request:*\n```{" ".join(self.tokens)}```',
                   f'*Rolled out:*\n```{self.expr}```',
                   f'*Result:*\n```{self.result.describe(mode=self.game_mode)}```']
