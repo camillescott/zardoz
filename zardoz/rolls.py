@@ -1,5 +1,5 @@
 import dice
-from dice import DiceException
+from dice import DiceBaseException
 from discord.ext import commands
 
 import logging
@@ -86,7 +86,7 @@ def expand_tokens(tokens, mode = None, variables = {}):
                 raise ValueError(f'Woah there cowboy, you trying to crash me? Try using 69 or less dice.')
             try:
                 resolved = dice.roll(token)
-            except DiceException:
+            except DiceBaseException:
                 log.error(f'Got invalid token: {token}.')
                 raise ValueError(f'I don\'t like this argument: `{token}`.')
             else:
