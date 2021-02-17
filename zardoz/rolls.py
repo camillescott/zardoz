@@ -17,7 +17,7 @@ SPLIT_PAT = '|'.join(map(re.escape, DELIMS))
 
 
 def split_operators(word):
-    return [t for t in re.split(f'({SPLIT_PAT})', word) if t not in ' ()']
+    return [t for t in re.split(f'({SPLIT_PAT})', word) if t not in ' ']
 
 
 def tokenize_roll(cmd):
