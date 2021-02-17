@@ -100,7 +100,7 @@ class ZardozDatabase(LoggingMixin):
                                    time=datetime.now().timestamp())
         await self.con.commit()
 
-    async def get_rolls(self, max_rolls=5, since=None):
+    async def get_rolls(self, member_id=None, max_rolls=5, since=None):
         async with self.get_rolls_cursor_cmd(max_rolls=max_rolls) as cur:
             async for row in cur:
                 result = dict(row)

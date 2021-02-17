@@ -1,5 +1,6 @@
 import typing
 
+import discord
 from discord.ext import commands
 
 from .database import fetch_guild_db
@@ -17,7 +18,8 @@ class HistoryCommands(commands.Cog, LoggingMixin):
 
     @commands.command(name='zhist', help='Display roll history.')
     @fetch_guild_db
-    async def zhist(self, ctx, max_rolls: typing.Optional[int] = 5):
+    async def zhist(self, ctx, member: typing.Optional[discord.Member],
+                               max_rolls: typing.Optional[int] = 5):
 
         records = [r async for r in ctx.guild_db.get_rolls(max_rolls=max_rolls)]
 

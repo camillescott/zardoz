@@ -7,6 +7,12 @@ select * from rolls
 order by time desc
 limit :max_rolls;
 
+-- name: get_user_rolls
+select * from rolls
+where member_id=:member_id
+order by time desc
+limit :max_rolls
+
 -- name: set_user_var!
 insert into user_vars
 values (:member_id, :var, :val)
