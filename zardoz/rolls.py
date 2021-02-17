@@ -1,35 +1,42 @@
 import dice
-from dice import DiceException
+from dice import DiceBaseException
 from discord.ext import commands
 
 import logging
 import re
 
+from .database import ZardozDatabase
 from .state import GameMode, MODE_DICE
 
 
 log = logging.getLogger()
 
+OPS = ['+', '-', '<=', '<', '>=', '>', '(', ')', r'#']
+DELIMS = [r'\s']
+SPLIT_PAT = '|'.join(list(map(re.escape, OPS)) + DELIMS)
 
-DELIMS = ['+', '-', '<=', '<', '>=', '>', '(', ')', '#', '\s']
-SPLIT_PAT = '|'.join(map(re.escape, DELIMS))
+
+def split_tokens(word):
+    log.info(f'SPLIT "{word}" on: "{SPLIT_PAT}"')
+    return [t for t in re.split(f'({SPLIT_PAT})', word)]
 
 
-def split_operators(word):
-    return [t for t in re.split(f'({SPLIT_PAT})', word) if t not in ' ()']
+def filter_tokens(tokens):
+    return [t for t in tokens if t and not re.match(r'\s', t)]
 
 
 def tokenize_roll(cmd):
 
     raw = []
 
+    log.info(f'Tokenize: "{cmd}"')
     if isinstance(cmd, str):
-        raw = split_operators(cmd)
+        raw = split_tokens(cmd)
     else:
         for arg in cmd:
-            raw.extend(split_operators(arg))
+            raw.extend(split_tokens(arg))
 
-    raw = [token.strip() for token in raw]
+    raw = filter_tokens(raw)
 
     tokens, tag = [], ''
     for i, token in enumerate(raw):
@@ -57,7 +64,7 @@ def expand_tokens(tokens, mode = None, variables = {}):
     for token in tokens:
         if token.isnumeric():
             expanded.append(token)
-        elif token in DELIMS:
+        elif token in OPS:
             expanded.append(token)
         elif token.startswith('$'):
             var = token.strip('$')
@@ -79,10 +86,11 @@ def expand_tokens(tokens, mode = None, variables = {}):
                 raise ValueError(f'Woah there cowboy, you trying to crash me? Try using 69 or less dice.')
             try:
                 resolved = dice.roll(token)
-            except DiceException:
+            except DiceBaseException:
                 log.error(f'Got invalid token: {token}.')
                 raise ValueError(f'I don\'t like this argument: `{token}`.')
             else:
+                log.info(f'Rolled a token: {token} -> {resolved}')
                 expanded.append(RollList(token, resolved))
 
     return expanded
@@ -98,34 +106,37 @@ def evaluate_expr(expanded_tokens):
 
 class RollHandler:
 
-    def __init__(self, ctx, log, db, roll, require_tag=False):
+    def __init__(self, ctx, log, variables, roll,
+                       require_tag=False, game_mode=GameMode.DEFAULT):
 
         log.info(f'Roll request: {roll}')
 
         self.ctx = ctx
         self.log = log
-        self.db = db
-        self.game_mode = db.get_guild_mode(ctx.guild)
-
-        variables = db.get_guild_vars(ctx.guild)
+        self.game_mode = game_mode
         self.roll = roll
+
         self.tokens, self.tag = tokenize_roll(roll)
         if require_tag and not self.tag:
             raise ValueError('Add a tag, it\'s the polite thing to do.')
+        self.log.info(f'Raw tokens: {self.tokens}')
 
         self.expanded = expand_tokens(self.tokens,
                                       mode = self.game_mode,
                                       variables = variables)
+        self.log.info(f'Expanded tokens: {self.expanded}')
         self.expr =  ' '.join((str(token) for token in self.expanded))
-
         
         self.result, eval_expr = evaluate_expr(self.expanded)
         if self.result is None:
             log.error(f'Python parsing error: {eval_expr}.')
             raise ValueError(f'Your syntax was scintillating, but I couldn\'t parse it.')
 
-        db.add_roll(ctx.guild, ctx.author, ' '.join(self.tokens), self.expr)
         log.info(f'Handled roll: {str(self)}')
+
+    async def add_to_db(self, db: ZardozDatabase):
+        await db.add_roll(self.ctx.author.id, self.ctx.author.nick, self.ctx.author.name,
+                          ' '.join(self.tokens), self.tag, self.expr)
 
     def msg(self):
         header = f':game_die: {self.ctx.author.mention}' + (f': *{self.tag}*' if self.tag else '')
@@ -162,7 +173,7 @@ class QuietRollHandler(RollHandler):
 class SekretRollHandler(RollHandler):
 
     def msg(self):
-        header = f'from **{self.ctx.author}** in **{self.ctx.guild}**: ' + (f'*{self.tag}*' if self.tag else '')
+        header = f':game_die: from **{self.ctx.author}** in **{self.ctx.guild}**: ' + (f'*{self.tag}*' if self.tag else '')
         result = [f'*Request:*\n```{" ".join(self.tokens)}```',
                   f'*Rolled out:*\n```{self.expr}```',
                   f'*Result:*\n```{self.result.describe(mode=self.game_mode)}```']
@@ -180,7 +191,8 @@ class RollList:
             self.roll = list(roll)
 
     def describe(self, **kwargs):
-        return ', '.join((str(r) for r in self.roll))
+        dsc = ', '.join((str(r) for r in self.roll))
+        return dsc if dsc else '0'
 
     def __iter__(self):
         for r in self.roll:
@@ -200,6 +212,12 @@ class RollList:
             return RollList(f'{self} + {other}', self.roll + other.roll)
         else:
             return RollList(f'{self} + {other}', (r + other for r in self.roll))
+
+    def __neg__(self):
+        return RollList(f'-{self}', (-r for r in self.roll))
+
+    def __pos__(self):
+        return RollList(f'+{self}', (+r for r in self.roll))
 
     def __sub__(self, other):
         return RollList(f'{self} - {other}', (r - other for r in self.roll))
@@ -252,7 +270,8 @@ class DiceDelta:
             else:
                 kind = 'S by' if pred else 'F by'
                 desc.append(f'{roll:4} ⤳ {kind} {delta}')
-        return '\n'.join(desc)
+        desc = '\n'.join(desc)
+        return desc if desc else '0'
 
 
 class SimpleRollConvert(commands.Converter):

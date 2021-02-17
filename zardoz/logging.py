@@ -4,6 +4,8 @@ from rich.logging import RichHandler
 
 
 def setup(log_file):
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+
     logging.basicConfig(
         filename=log_file,
         level=logging.INFO,
@@ -25,9 +27,12 @@ class LoggingMixin:
         
     def register_decos(self):
 
-        @self.bot.before_invoke
-        async def log_cmd_invoke(ctx):
-            self.log.info(f'CMD: [{ctx.invoked_with} {ctx.message.content}] from {ctx.author}:{ctx.guild}')
+        try:
+            @self.bot.before_invoke
+            async def log_cmd_invoke(ctx):
+                self.log.info(f'CMD: [{ctx.invoked_with} {ctx.message.content}] from {ctx.author}:{ctx.guild}')
+        except AttributeError:
+            pass
 
     @staticmethod
     def get_logger():

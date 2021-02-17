@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import IntEnum, auto
 
 from discord.ext import commands
@@ -37,13 +38,14 @@ class Database:
                 self.modes.insert({'guild_id': guild.id,
                                    'mode': GameMode.DEFAULT})
 
-    def add_roll(self, guild, member, expr, result):
-        self.rolls.insert({'guild_id': guild.id,
-                           'guild_name': guild.name,
+    def add_roll(self, guild, member, roll, tag, result):
+        self.rolls.insert({'time': datetime.now().timestamp(),
+                           'guild_id': guild.id,
                            'member_id': member.id,
                            'member_nick': member.nick,
                            'member_name': member.name,
-                           'expr': expr,
+                           'roll': roll,
+                           'tag': tag,
                            'result': result})
 
     def query_guild_rolls(self, guild):

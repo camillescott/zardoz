@@ -1,3 +1,5 @@
+import os
+
 __author__ = """Camille Scott"""
 __email__ = 'cswel@ucdavis.edu'
 __version__ = '0.4.0'
@@ -10,5 +12,6 @@ __splash__ = f'''
                                 by {__author__}
 '''
 __about__ = 'A discord dice-rolling bot with lots of nifty features.'
+__testing__ = bool(os.environ.get('ZARDOZ_DEBUG', False))
 
 from .zardoz import main
