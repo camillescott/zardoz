@@ -11,26 +11,32 @@ from .state import GameMode, MODE_DICE
 
 log = logging.getLogger()
 
+OPS = ['+', '-', '<=', '<', '>=', '>', '(', ')', r'#']
+DELIMS = [r'\s']
+SPLIT_PAT = '|'.join(list(map(re.escape, OPS)) + DELIMS)
 
-DELIMS = ['+', '-', '<=', '<', '>=', '>', '(', ')', '#', '\s']
-SPLIT_PAT = '|'.join(map(re.escape, DELIMS))
+
+def split_tokens(word):
+    log.info(f'SPLIT "{word}" on: "{SPLIT_PAT}"')
+    return [t for t in re.split(f'({SPLIT_PAT})', word)]
 
 
-def split_operators(word):
-    return [t for t in re.split(f'({SPLIT_PAT})', word) if t not in ' ']
+def filter_tokens(tokens):
+    return [t for t in tokens if t and not re.match(r'\s', t)]
 
 
 def tokenize_roll(cmd):
 
     raw = []
 
+    log.info(f'Tokenize: "{cmd}"')
     if isinstance(cmd, str):
-        raw = split_operators(cmd)
+        raw = split_tokens(cmd)
     else:
         for arg in cmd:
-            raw.extend(split_operators(arg))
+            raw.extend(split_tokens(arg))
 
-    raw = [token.strip() for token in raw]
+    raw = filter_tokens(raw)
 
     tokens, tag = [], ''
     for i, token in enumerate(raw):
@@ -58,7 +64,7 @@ def expand_tokens(tokens, mode = None, variables = {}):
     for token in tokens:
         if token.isnumeric():
             expanded.append(token)
-        elif token in DELIMS:
+        elif token in OPS:
             expanded.append(token)
         elif token.startswith('$'):
             var = token.strip('$')
@@ -84,6 +90,7 @@ def expand_tokens(tokens, mode = None, variables = {}):
                 log.error(f'Got invalid token: {token}.')
                 raise ValueError(f'I don\'t like this argument: `{token}`.')
             else:
+                log.info(f'Rolled a token: {token} -> {resolved}')
                 expanded.append(RollList(token, resolved))
 
     return expanded
@@ -112,10 +119,12 @@ class RollHandler:
         self.tokens, self.tag = tokenize_roll(roll)
         if require_tag and not self.tag:
             raise ValueError('Add a tag, it\'s the polite thing to do.')
+        self.log.info(f'Raw tokens: {self.tokens}')
 
         self.expanded = expand_tokens(self.tokens,
                                       mode = self.game_mode,
                                       variables = variables)
+        self.log.info(f'Expanded tokens: {self.expanded}')
         self.expr =  ' '.join((str(token) for token in self.expanded))
         
         self.result, eval_expr = evaluate_expr(self.expanded)
