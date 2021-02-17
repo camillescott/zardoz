@@ -5,6 +5,7 @@ include LICENSE
 include README.rst
 
 recursive-include zardoz/crits *.yaml
+recursive-include zardoz/sql *.sql
 
 recursive-include tests *
 recursive-exclude * __pycache__
