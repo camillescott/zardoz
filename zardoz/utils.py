@@ -10,6 +10,9 @@ from xdg import xdg_data_home
 __pkg_dir__ = os.path.abspath(os.path.dirname(__file__))
 __time_format__ = '%a %b %d %I:%M%p %Z'
 
+FAILURE = 'F 🛇'
+SUCCESS = 'S ✅'
+
 
 def default_database_dir(debug=False):
     if not debug:

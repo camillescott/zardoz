@@ -7,6 +7,7 @@ import re
 
 from .database import ZardozDatabase
 from .state import GameMode, MODE_DICE
+from .utils import SUCCESS, FAILURE
 
 
 log = logging.getLogger()
@@ -140,9 +141,9 @@ class RollHandler:
 
     def msg(self):
         header = f':game_die: {self.ctx.author.mention}' + (f': *{self.tag}*' if self.tag else '')
-        result = [f'*Request:*\n```{" ".join(self.tokens)}```',
-                  f'*Rolled out:*\n```{self.expr}```',
-                  f'*Result:*\n```{self.result.describe(mode=self.game_mode)}```']
+        result = [f'***Request:***  `{" ".join(self.tokens)}`\n',
+                  f'***Rolled out:***  `{self.expr}`\n',
+                  f'***Result:***\n```{self.result.describe(mode=self.game_mode)}```']
         result = ''.join(result)
         msg = '\n'.join((header, result))
 
@@ -174,9 +175,9 @@ class SekretRollHandler(RollHandler):
 
     def msg(self):
         header = f':game_die: from **{self.ctx.author}** in **{self.ctx.guild}**: ' + (f'*{self.tag}*' if self.tag else '')
-        result = [f'*Request:*\n```{" ".join(self.tokens)}```',
-                  f'*Rolled out:*\n```{self.expr}```',
-                  f'*Result:*\n```{self.result.describe(mode=self.game_mode)}```']
+        result = [f'***Request:***  `{" ".join(self.tokens)}`\n',
+                  f'***Rolled out:***  `{self.expr}`\n',
+                  f'***Result:***\n```{self.result.describe(mode=self.game_mode)}```']
         result = ''.join(result)
         return '\n'.join((header, result))
 
@@ -261,14 +262,14 @@ class DiceDelta:
         for roll, delta, pred in zip(self.rolls, self.deltas, self.predicates):
             if mode is GameMode.RT and 'd100' in self.expr:
                 degrees = delta // 10
+                status = SUCCESS if pred else FAILURE
                 if degrees > 0:
-                    kind = 'S ✅' if pred else 'F 🛇'
-                    result = f'{kind} {degrees}°'
+                    result = f'{status} {degrees}°'
                 else:
-                    result = 'S ✅' if pred else 'F 🛇'
+                    result = status
                 desc.append(f'{roll:4} ⤳ {result}')
             else:
-                kind = 'S ✅ by' if pred else 'F 🛇 by'
+                kind = f'{SUCCESS} by' if pred else f'{FAILURE} by'
                 desc.append(f'{roll:4} ⤳ {kind} {delta}')
         desc = '\n'.join(desc)
         return desc if desc else '0'
