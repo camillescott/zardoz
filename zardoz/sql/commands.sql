@@ -11,7 +11,13 @@ limit :max_rolls;
 select * from rolls
 where member_id=:member_id
 order by time desc
-limit :max_rolls
+limit :max_rolls;
+
+-- name: get_last_user_roll^
+select * from rolls
+where member_id=:member_id
+order by time desc
+limit 1;
 
 -- name: set_user_var!
 insert into user_vars

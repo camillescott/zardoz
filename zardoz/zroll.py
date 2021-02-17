@@ -64,3 +64,21 @@ class RollCommands(commands.Cog, LoggingMixin):
         else:
             await roll.add_to_db(ctx.guild_db)
             await member.send(roll.msg())
+
+    @commands.command(name='zr', help='Reroll previous roll')
+    @fetch_guild_db
+    @handle_http_exception
+    async def zroll_reroll(self, ctx, member: typing.Optional[discord.Member]):
+        if member is None:
+            member = ctx.author
+
+        saved = await ctx.guild_db.get_last_user_roll(member.id)
+
+        if saved is None:
+            await ctx.message.reply(f'Ope, no roll history for {member}.')
+        else:
+            cmd = saved['roll']
+            roll = RollHandler(ctx, self.log, ctx.variables, cmd,
+                               game_mode=ctx.game_mode)
+            await roll.add_to_db(ctx.guild_db)
+            await ctx.message.reply(f'Reroll {roll.msg()}')

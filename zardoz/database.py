@@ -89,6 +89,10 @@ class ZardozDatabase(LoggingMixin):
         await con.commit()
 
         return cls(con, guild_id)
+
+    @staticmethod
+    def convert_time(timestamp):
+        return datetime.fromtimestamp(timestamp).astimezone()
         
     async def close(self):
         await self.con.close()
@@ -106,8 +110,17 @@ class ZardozDatabase(LoggingMixin):
         async with self.get_rolls_cursor_cmd(max_rolls=max_rolls) as cur:
             async for row in cur:
                 result = dict(row)
-                result['time'] = datetime.fromtimestamp(result['time']).astimezone()
+                result['time'] = self.convert_time(result['time'])
                 yield result
+
+    async def get_last_user_roll(self, member_id: int):
+        roll = await self.get_last_user_roll_cmd(member_id)
+        if not roll:
+            return None
+
+        roll = dict(roll)
+        roll['time'] = self.convert_time(roll['time'])
+        return roll
 
     async def get_merged_vars(self, member_id: int):
         user_vars = await self.get_user_vars(member_id)
