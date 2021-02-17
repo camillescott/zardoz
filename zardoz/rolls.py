@@ -213,6 +213,12 @@ class RollList:
         else:
             return RollList(f'{self} + {other}', (r + other for r in self.roll))
 
+    def __neg__(self):
+        return RollList(f'-{self}', (-r for r in self.roll))
+
+    def __pos__(self):
+        return RollList(f'+{self}', (+r for r in self.roll))
+
     def __sub__(self, other):
         return RollList(f'{self} - {other}', (r - other for r in self.roll))
 
