@@ -1,0 +1,59 @@
+full_name: Energy Critical Effects - Arm
+slug: rt_en_arm
+game: RT
+book: Core.252
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      A blast to the arm leaves it all numb and tingly. Tests made involving the arm are at –30 for 1 Round.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The attack smashes the arm, sending currents of energy crackling down to the fingers and up to the shoulder. The arm
+      is useless for 1d5 Rounds and the character takes 1 level of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The attack burns the target’s arm leaving him Stunned for 1 Round and inflicts 2 levels of Fatigue. The arm is useless
+      for 1d5 Rounds.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The shock of the attack makes the target vomit. He is Stunned for 1 Round and takes 3 levels of Fatigue. The arm is
+      useless for 1d10 Rounds.
+  - range: [5, 5]
+    name: 
+    effect: |
+      The arm suffers superficial burns inflicting no small amount o pain on the target. The target’s WS and BS are halved
+      (round down) for 1 Round and the target takes 1d5 levels of Fatigue.
+  - range: [6, 6]
+    name:
+    effect: |
+      The attack wreathes the arm in flam , scorching clothing and armour, and temporarily fusing together the target’s
+      fingers. The target halves WS and BS for 1d10 Rounds, takes 1d5 levels of Fatigue, and must successfully Test
+      Toughness or lose the use of the hand permanently.
+  - range: [7, 7]
+    name: 
+    effect: |
+      With a terrible snapping sound, the heat of the attack boils the marrow in the target’s arm, causing it to shatter. The
+      target’s arm is broken and until it is repaired the target counts as only having one arm. The target is Stunned for 1
+      Round and also takes 1d5 levels of Fatigue.
+  - range: [8, 8]
+    name:
+    effect: |
+      Energy sears through the arm at the shoulder, causing the limb to be severed from the body. The target must take a
+      Toughness Test or become Stunned for 1 Round. In addition the target takes 1d10 levels of Fatigue and is suffering
+      from Blood Loss. The target now only has one arm.
+  - range: [9, 9]
+    name:
+    effect: |
+      Fire consumes the target’s arm, burning the flesh to a crisp right down to the bon . The target must make an immediate
+      Toughness Test or die from shock. If he survives, however, the target takes 1d10 levels of Fatigue and is Stunned for 1
+      Round. The target now only has one arm.
+  - range: [10,1000]
+    name:
+    effect: | 
+      The attack reduces the arm to a cloud of ash and sends the target crumbling to the ground where he immediately dies
+      from shock, clutching his smoking stump.
