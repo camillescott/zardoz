@@ -5,6 +5,7 @@ from discord.ext import commands
 import logging
 import re
 
+from .database import ZardozDatabase
 from .state import GameMode, MODE_DICE
 
 
@@ -98,17 +99,16 @@ def evaluate_expr(expanded_tokens):
 
 class RollHandler:
 
-    def __init__(self, ctx, log, db, roll, require_tag=False):
+    def __init__(self, ctx, log, variables, roll,
+                       require_tag=False, game_mode=GameMode.DEFAULT):
 
         log.info(f'Roll request: {roll}')
 
         self.ctx = ctx
         self.log = log
-        self.db = db
-        self.game_mode = db.get_guild_mode(ctx.guild)
-
-        variables = db.get_guild_vars(ctx.guild)
+        self.game_mode = game_mode
         self.roll = roll
+
         self.tokens, self.tag = tokenize_roll(roll)
         if require_tag and not self.tag:
             raise ValueError('Add a tag, it\'s the polite thing to do.')
@@ -117,15 +117,17 @@ class RollHandler:
                                       mode = self.game_mode,
                                       variables = variables)
         self.expr =  ' '.join((str(token) for token in self.expanded))
-
         
         self.result, eval_expr = evaluate_expr(self.expanded)
         if self.result is None:
             log.error(f'Python parsing error: {eval_expr}.')
             raise ValueError(f'Your syntax was scintillating, but I couldn\'t parse it.')
 
-        db.add_roll(ctx.guild, ctx.author, ' '.join(self.tokens), self.expr)
         log.info(f'Handled roll: {str(self)}')
+
+    async def add_to_db(self, db: ZardozDatabase):
+        await db.add_roll(self.ctx.author.id, self.ctx.author.nick, self.ctx.author.name,
+                          ' '.join(self.tokens), self.tag, self.expr)
 
     def msg(self):
         header = f':game_die: {self.ctx.author.mention}' + (f': *{self.tag}*' if self.tag else '')

@@ -3,7 +3,7 @@ import aiosql
 import aiosqlite
 
 import asyncio
-import datetime
+from datetime import datetime
 import functools
 import os
 import sqlite3
