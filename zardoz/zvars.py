@@ -1,5 +1,6 @@
 from discord.ext import commands
 
+from .database import fetch_guild_db
 from .logging import LoggingMixin
 
 
@@ -17,8 +18,9 @@ class VarCommands(commands.Cog, LoggingMixin):
             pass
 
     @zvar.command(name='list', help='Print current variables.')
+    @fetch_guild_db
     async def zvar_list(self, ctx):
-        variables = self.db.get_guild_vars(ctx.guild)
+        variables = await ctx.guild_db.get_guild_vars()
         if variables:
             result = [f'**{key}**: {val}' for key, val in variables.items()]
             await ctx.send('\n'.join(result))
@@ -26,19 +28,22 @@ class VarCommands(commands.Cog, LoggingMixin):
             await ctx.send('**No variables set.**')
     
     @zvar.command(name='set', help='Set variables for the server.')
+    @fetch_guild_db
     async def zvar_set(self, ctx, var: str, val: int):
-        self.db.set_var(ctx.guild, var, val)
+        await ctx.guild_db.set_guild_var(ctx.member.id, var, val)
         await ctx.send(f'**{var}** = {val}')
 
     @zvar.command(name='get', help='Print a variable value.')
+    @fetch_guild_db
     async def zvar_get(self, ctx, var: str):
-        val = self.db.get_var(ctx.guild, var)
+        val = ctx.guild_db.get_guild_var(var)
         if val is None:
             await ctx.send(f'**{var}** is not defined.')
         else:
             await ctx.send(f'**{var}** = {val}')
 
     @zvar.command(name='del', help='Delete a variable.')
+    @fetch_guild_db
     async def zvar_del(self, ctx, var: str):
-        self.db.del_var(ctx.guild, var)
+        ctx.guild_db.del_var(ctx.guild, var)
         await ctx.send(f'**{var}** deleted')

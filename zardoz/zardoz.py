@@ -2,7 +2,6 @@ import dice
 
 import discord
 from discord.ext import commands
-from xdg import xdg_data_home
 
 import argparse
 import json
@@ -12,9 +11,10 @@ import sys
 import textwrap
 
 from .logging import setup as setup_logger
-from .state import Database
 
-from . import __version__, __splash__, __about__
+from . import __version__, __splash__, __about__, __testing__
+from .database import DatabaseCache
+from .utils import default_log_file, default_database_dir
 from .zcrit import CritCommands
 from .zhistory import HistoryCommands
 from .zmode import ModeCommands
@@ -41,22 +41,22 @@ def main():
              'option will override that.'
     )
     parser.add_argument(
-        '--database',
+        '--database-dir',
         type=lambda p: Path(p).absolute(),
-        default=xdg_data_home().joinpath('zardoz-bot', 'db.json'),
-        help='Path to the bot database. Default follows the '\
+        default=default_database_dir(debug=__testing__),
+        help='Directory for the bot databases. Default follows the '\
              'XDG specifiction.'
     )
     parser.add_argument(
         '--log',
         type=lambda p: Path(p).absolute(),
-        default=xdg_data_home().joinpath('zardoz-bot', 'bot.log'),
+        default=default_log_file(debug=__testing__),
         help='Path to the log file. Default follows the '\
              'XDG specifiction.'
     )
     args = parser.parse_args()
 
-    log = setup_logger(log_file=args.log)
+    log = setup_logger(args.log)
 
     TOKEN = args.secret_token
     if not TOKEN:
@@ -69,17 +69,24 @@ def main():
             log.info('Got secret token from $ZARDOZ_TOKEN.')
 
     # get a handle for the history database
-    args.database.parent.mkdir(exist_ok=True)
-    DB = Database(args.database)
+    DB = DatabaseCache(args.database_dir)
 
-    bot = commands.Bot(command_prefix='/')
+    class ZardozBot(commands.Bot):
+
+        async def close(self):
+            log.info('DatabaseCache close()')
+            await DB.close()
+            log.info('Bot close()')
+            await super().close()
+            log.info('Bot closed.')
+
+    bot = ZardozBot(command_prefix='/')
 
 
     @bot.event
     async def on_ready():
         log.info(f'Ready: member of {bot.guilds}')
         log.info(f'Users: {bot.users}')
-        DB.add_guilds(bot.guilds)
 
     @bot.command(name='zabout', help='Project info.')
     async def zabout(ctx):
@@ -87,7 +94,6 @@ def main():
               f'source: https://github.com/camillescott/zardoz\n'\
               f'active installs: {len(bot.guilds)}'
         await ctx.message.reply(msg)
-        
 
     bot.add_cog(RollCommands(bot, DB))
     bot.add_cog(CritCommands(bot, DB))

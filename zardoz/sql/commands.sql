@@ -3,7 +3,8 @@ insert into rolls
 values (:member_id, :member_nick, :member_name, :roll, :tag, :result, :time);
 
 -- name: get_rolls
-select * from rolls;
+select * from rolls
+limit :max_rolls;
 
 -- name: set_user_var!
 insert into user_vars
@@ -27,7 +28,7 @@ where member_id=:member_id and var=:var;
 insert into guild_vars
 values (:member_id, :var, :val)
 on conflict (member_id, var)
-do update set member_id=:member_id val=:val;
+do update set member_id=:member_id, val=:val;
 
 -- name: get_guild_var^
 select * from guild_vars
