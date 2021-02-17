@@ -262,13 +262,13 @@ class DiceDelta:
             if mode is GameMode.RT and 'd100' in self.expr:
                 degrees = delta // 10
                 if degrees > 0:
-                    kind = 'DoS' if pred else 'DoF'
-                    result = f'{degrees} {kind}'
+                    kind = 'S ✅' if pred else 'F 🛇'
+                    result = f'{kind} {degrees}°'
                 else:
-                    result = 'success' if pred else 'failure'
+                    result = 'S ✅' if pred else 'F 🛇'
                 desc.append(f'{roll:4} ⤳ {result}')
             else:
-                kind = 'S by' if pred else 'F by'
+                kind = 'S ✅ by' if pred else 'F 🛇 by'
                 desc.append(f'{roll:4} ⤳ {kind} {delta}')
         desc = '\n'.join(desc)
         return desc if desc else '0'
