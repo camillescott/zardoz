@@ -8,6 +8,7 @@ import yaml
 from discord.ext import commands
 
 from .logging import LoggingMixin
+from .rolls import SimpleRollConvert
 from .utils import __pkg_dir__
 
 
@@ -73,35 +74,36 @@ class CritCommands(commands.Cog, LoggingMixin):
 
         self.log.info(f'Loaded crits: {TABLES}')
 
-    @commands.group(name='zcrit', help='Roll on a crit table.')
-    async def zcrit(self, ctx, table: typing.Optional[TableConvert],
-                               val: typing.Optional[int]):
+    @commands.command(name='zcrit', help='Roll on a crit table.')
+    async def zcrit(self, ctx, table: TableConvert = None,
+                               val: SimpleRollConvert = None):
         if ctx.invoked_subcommand is not None:
             return
 
         if table is None:
-            await ctx.invoke(self.zcrit_list)
+            header = '**Available Tables:**'
+            body = []
+            for slug, table in TABLES.items():
+                body.append(f'`{slug:15}` {table.full_name} ({table.game}, {table.book})')
+            body = '\n'.join(body)
+            await ctx.message.reply(f'{header}\n{body}')
+
+            self.log.info(f'/zcrit: {table.slug}, {val}')
             return
 
         try:
             if val is None:
                 val, name, effect = table.roll()
+                result = f'{table.die} ⤳ {val}'
             else:
-                name, effect = table.get(val)
+                name, effect = table.get(int(val))
+                result = f'{val}'
         except ValueError:
             await ctx.message.reply(f'Bad crit table value. Perils be upon ye.')
         else:
-            msg = f'**Result:** {table.die} ⤳ {val}\n'\
+            msg = f'**Roll:** {result}\n'\
                   f'**Table:** {table.full_name} ({table.game}, {table.book})\n'\
                   f'**Name:** {name}\n'\
                   f'**Effect:** {effect}'
             await ctx.message.reply(msg)
 
-    @zcrit.command(name='list', help='List available crit tables.')
-    async def zcrit_list(self, ctx):
-        header = '**Available Tables:**'
-        body = []
-        for slug, table in TABLES.items():
-            body.append(f'`{slug:15}` {table.full_name} ({table.game}, {table.book})')
-        body = '\n'.join(body)
-        await ctx.message.reply(f'{header}\n{body}')

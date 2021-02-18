@@ -182,6 +182,18 @@ class SekretRollHandler(RollHandler):
         return '\n'.join((header, result))
 
 
+class DieResult:
+
+    def __init__(self, expr, result):
+        if not isinstance(result, int):
+            raise ValueError(f'Must be scalar (got {result}).')
+        self.expr = expr
+        self.result = result
+
+    def __str__(self):
+        return f'{self.expr} ⤳ {self.result}'
+
+
 class RollList:
     def __init__(self, expr, roll):
         self.expr = expr
@@ -280,17 +292,18 @@ class SimpleRollConvert(commands.Converter):
     pat = r'^\d+d\d+t?$'
 
     async def convert(self, ctx, argument):
-        match = re.match(pat, argument)
+        match = re.match(self.pat, argument)
+        log.info(f'match {argument}')
+
         if match is None:
+            log.info(f'SimpleRollConvert: {argument} did not match')
             raise commands.BadArgument(f'{argument} is not a simple roll.')
         try:
             roll = dice.roll(argument)
         except:
+            log.info(f'Failed to parse roll: {argument}')
             raise commands.BadArgument(f'Failed to parse roll: {argument}')
         else:
             log.info(f'SimpleRoll: {argument} ⤳ {roll}')
-            if isinstance(roll, int):
-                return roll
-            else:
-                return sum(roll)
+            return DieResult(argument, int(roll))
 
