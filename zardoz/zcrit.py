@@ -20,7 +20,7 @@ from .rolls import SimpleRollConvert
 from .utils import __pkg_dir__
 
 
-class CritTable:
+class RollTable:
 
     def __init__(self, table_yaml):
         with open(table_yaml) as fp:
@@ -52,10 +52,10 @@ class CritTable:
 
 def load_crit_tables(log=None):
     
-    files = glob.glob(os.path.join(__pkg_dir__, 'crits', '*.yaml'))
+    files = glob.glob(os.path.join(__pkg_dir__, 'tables', '*.yaml'))
     tables = {}
     for file_path in files:
-        table = CritTable(file_path)
+        table = RollTable(file_path)
         tables[table.slug] = table
     return tables
 
@@ -73,17 +73,17 @@ class TableConvert(commands.Converter):
         return table
 
 
-class CritCommands(commands.Cog, LoggingMixin):
+class TableCommands(commands.Cog, LoggingMixin):
 
     def __init__(self, bot, db):
         self.bot = bot
         self.db = db
         super().__init__()
 
-        self.log.info(f'Loaded crits: {TABLES}')
+        self.log.info(f'Loaded tables: {TABLES}')
 
-    @commands.command(name='zcrit', help='Roll on a crit table.')
-    async def zcrit(self, ctx, table: TableConvert = None,
+    @commands.command(name='ztable', help='Roll on a table.')
+    async def ztable(self, ctx, table: TableConvert = None,
                                val: typing.Union[int, SimpleRollConvert] = None):
         if ctx.invoked_subcommand is not None:
             return
@@ -96,7 +96,7 @@ class CritCommands(commands.Cog, LoggingMixin):
             body = '\n'.join(body)
             await ctx.message.reply(f'{header}\n{body}')
 
-            self.log.info(f'/zcrit: {table.slug}, {val}')
+            self.log.info(f'/ztable: {table.slug}, {val}')
             return
 
         try:
@@ -107,7 +107,7 @@ class CritCommands(commands.Cog, LoggingMixin):
                 name, effect = table.get(int(val))
                 result = f'{val}'
         except ValueError:
-            await ctx.message.reply(f'Bad crit table value. Perils be upon ye.')
+            await ctx.message.reply(f'Bad table value. Perils be upon ye.')
         else:
             msg = f'**Roll:** {result}\n'\
                   f'**Table:** {table.full_name} ({table.game}, {table.book})\n'\
