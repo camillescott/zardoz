@@ -1,0 +1,55 @@
+full_name: Energy Critical Effects - Head
+slug: rt_en_head
+game: RT
+book: Core.253
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      A grazing blow to the head frazzles the target’s senses, imposing a –10 penalty to all Tests (except Toughness) for 1 Round.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The blast of energy dazzles the target, leaving him blinded for 1 Round.
+  - range: [3, 3]
+    name:
+    effect: |
+      The attack cooks off the target’s ear, leaving him Stunned for 1 Round and inflicting 1 level of Fatigue.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The energy attack burns away all of the hairs on the target’s head as well as leaving him reeling from the injury.
+      The attack deals 2 levels of Fatigue and the target is blinded for 1d5 Rounds.
+  - range: [5, 5]
+    name: 
+    effect: |
+      A blast of energy envelopes the target’s head, burning his face and hair, and causing him to scream like a stuck Grox.
+      In addition to losing his hair, he is blinded for 1d10 Rounds and takes 3 levels of Fatigue.
+  - range: [6, 6]
+    name:
+    effect: |
+      The attack cooks the target’s face, melting his features and damaging his eyes. 
+      The target is blinded for the next 1d10 hours and permanently reduces his Fellowship characteristic by 
+      1d10 points. The target also takes 1d5 levels of Fatigue.
+  - range: [7, 7]
+    name: 
+    effect: |
+      In a gruesome display, the flesh is burned from the target’s head, exposing charred bone and muscle underneath. The
+      target is blinded permanently and takes 1d10 levels of Fatigue. Also, roll 1d10. This is the target’s new Fellowship,
+      unless their Fellowship is already 10 or less, in which case nobody really notices the difference.
+  - range: [8, 8]
+    name:
+    effect: |
+      The target’s head is destroyed in a convocation of fiery death. He does not survive.
+  - range: [9, 9]
+    name:
+    effect: |
+      Superheated by the attack, the target’s brain explodes, tearing apart his skull and sending flaming hunks of meat flying
+      at those nearby. The target is no more.
+  - range: [10,1000]
+    name:
+    effect: | 
+      As 9 (dead with exploded brain), except the target’s entire body catches fire and runs off headless 2d10 metres in a random direction (use the
+      Scatter Diagram on page 248). Anything flammable it passes, including characters, must make an Agility Test or catch
+      fire (see Special Damage, Core.260).
