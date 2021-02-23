@@ -1,0 +1,59 @@
+full_name: Rending Critical Effects - Body
+slug: rt_rend_body
+game: RT
+book: Core.258
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      If the target is not wearing armour on this location, he takes 1 level of Fatigue from a painful laceration. If he is
+      wearing armour, there is no effect. Phew!
+  - range: [2, 2]
+    name: 
+    effect: |
+      The attack Damages the target’s armour, reducing its Armour Points by 1. In addition, the target takes 1 level of
+      Fatigue. If not armoured, the target is also Stunned for 1 Round.
+  - range: [3, 3]
+    name:
+    effect: |
+      The attack rips a large patch of skin from the target’s torso, leaving him gasping in pain. The target is Stunned for 1
+      Round and takes 2 levels of Fatigue.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      A torrent of blood spills from the deep cuts, making the ground slick with gore. All characters attempting to move
+      through this pool of blood must succeed on an Agility Test or fall Prone. The target takes 1d5 levels of Fatigue.
+  - range: [5, 5]
+    name: 
+    effect: |
+      The blow opens up a long wound in the target’s torso, causing him to double over in terrible pain. The target takes 1d5
+      levels of Fatigue.
+  - range: [6, 6]
+    name:
+    effect: |
+      The mighty attack takes a sizeable chunk out of the target and knocks him to the ground as he clutches the oozing
+      wound, shrieking in pain. The target is Prone and takes 1d10 levels of Fatigue.
+  - range: [7, 7]
+    name: 
+    effect: |
+      The attack cuts open the target’s abdomen. The target can either choose to use one arm to hold his guts in (until a
+      medic can bind them in place with a successful Medicae Test), or fight on regardless and risk a 20% chance each turn
+      that his middle splits open, spilling his intestines all over the ground, causing an additional 2d10 Damage. In either
+      case, the target takes 1d5 levels of Fatigue and is now suffering Blood Loss.
+  - range: [8, 8]
+    name:
+    effect: |
+      With a vile tearing noise, the skin on the target’s chest comes away revealing a red ruin of muscle. The target must make
+      a Challenging (+0) Toughness Test or die. If he passes, he permanently loses 1d10 from his Toughness, takes 1d10
+      levels of Fatigue, and now suffers Blood Loss.
+  - range: [9, 9]
+    name:
+    effect: |
+      The powerful blow cleaves the target from gullet to groin, revealing his internal organs and spilling them on to the
+      ground before him. The target is now quite dead.
+  - range: [10, 1000]
+    name:
+    effect: |
+      As in 9 (eviscerated), except that the area and the target are awash with gore. For the rest of the fight, anyone moving within four
+      metres of the target’s corpse must make make a Challenging (+0) Agility Test or fall prone.

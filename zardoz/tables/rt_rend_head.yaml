@@ -1,0 +1,60 @@
+full_name: Rending Critical Effects - Head
+slug: rt_rend_head
+game: RT
+book: Core.259
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      The attack tears skin from the target’s face dealing 1 level of Fatigue. If the target is wearing a helmet, there is no effect.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The attack slices open the target’s scalp which immediately begins to bleed profusely. Due to blood pouring into the
+      target’s eyes, he suffers a –10 penalty to both Weapon Skill and Ballistic Skill for the next 1d10 Turns. The target takes
+      1 level of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The attack tears the target’s helmet from his head. If wearing no helmet, the target loses an ear instead and inflicts 2
+      levels of Fatigue.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The attack scoops out one of the target’s eyes, inflicting 1d5 le els of Fatigue and leaving the target Stunned for 1
+      Round.
+  - range: [5, 5]
+    name: 
+    effect: |
+      The attack opens up the target’s face, leaving him Stunned for 1d5 Rounds and inflicting 1d5 le els of Fatigue. If the
+      target is wearing a helmet, the helmet comes off.
+  - range: [6, 6]
+    name:
+    effect: |
+      As the blow rips violently across the target’s face—it takes with it an important feature. Roll 1d10 to see what the
+      target has lost. 1–3: Eye (see Permanent Effects on Cor.201), 4–7: Nose (permanently halve Fellowship), 8–10: Ear
+      (permanently reduce Fellowship by 1d10; the wound can always be hidden with hair.) In addition, the target is now
+      suffering Blood Loss and takes 1d5 levels of Fatigue.
+  - range: [7, 7]
+    name: 
+    effect: |
+      In a splatter of skin and teeth, the attack removes most of the target’s face. He is permanently blinded and has his
+      Fellowship permanently reduced to 1d10, and also now has trouble speaking without slurring his words. In addition,
+      the target is suffering from Blood Loss and takes 1d10 levels of Fatigue.
+  - range: [8, 8]
+    name:
+    effect: |
+      The blow slices into the side of the target’s head causing his eyes to pop out and his brain to ooze down his cheek like
+      spilled jelly. He’s dead before he hits the ground.
+  - range: [9, 9]
+    name:
+    effect: |
+      With a sound not unlike a wet sponge being torn in half, the target’s head flies free of its body and sails through the air,
+      landing harmlessly 2d10 metres away with a soggy thud. The target is instantly slain.
+  - range: [10, 1000]
+    name:
+    effect: |
+      As in 9 (decapitation), except the target’s neck spews blood in a torrent, drenching all those nearby and forcing them to make a
+      Challenging (+0) Agility Test. Anyone who fails the Test suffers a –10 penalty to his Weapon Skill and Ballistic
+      Skill Tests for 1 Round as gore fills his eyes or fouls his visor.

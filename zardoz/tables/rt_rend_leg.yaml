@@ -1,0 +1,58 @@
+full_name: Rending Critical Effects - Leg
+slug: rt_rend_leg
+game: RT
+book: Core.259
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      The attack knocks the limb backwards, painfully jerking it away from the body. The target takes 1 level of Fatigue.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The target’s kneecap splits open. He must make a Challenging (+0) Agility Test or fall prone. Regardless, he takes 1
+      level of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The attack rips a length of flesh from the leg, causing blood to gush from the wound. The target takes 1 level of Fatigue
+      and suffers Blood Loss.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The attack rips the kneecap free from the target’s leg, causing it to collapse out from under him. The target moves at
+      half speed until medical attention is received. In addition, he takes 2 levels of Fatigue.
+  - range: [5, 5]
+    name: 
+    effect: |
+      In a spray of blood, the target’s leg is opened up, exposing bone, sinew and muscle. The target takes 1d5 levels of
+      Fatigue and halves his movement for 1d10 hours.
+  - range: [6, 6]
+    name:
+    effect: |
+      The blow slices a couple of centimetres off the end of the target’s foot. The target must make an immediate
+      Challenging (+0) Toughness Test or permanently lose the use of his foot. On a success, movement is halved until he
+      receives medical attention. In either case, the target takes 1d5 levels of Fatigue.
+  - range: [7, 7]
+    name: 
+    effect: |
+      The force of the blow cuts deep into the leg, grinding against bone and tearing ligaments apart. The leg is broken and,
+      until repaired, the target counts as having only one leg. In addition, the level of maiming is such that the target is now
+      suffering from Blood Loss. He also takes 1d10 levels of Fatigue.
+  - range: [8, 8]
+    name:
+    effect: |
+      In a single bloody hack the leg is lopped off the target, spurting its vital fluids across the ground. The target must
+      immediately make a Toughness Test or die from shock. On a success, the target is Stunned for 1d10 Rounds, takes
+      1d10 Fatigue and suffers Blood Loss. He now has only one leg.
+  - range: [9, 9]
+    name:
+    effect: |
+      With a meaty chop, the leg comes away at the hip. The target pitches to the ground howling in agony, before dying
+      moments later.
+  - range: [10, 1000]
+    name:
+    effect: |
+      As in 9 (very dead), except that the tide of blood is so intense that, for the remainder of the battle, anyone making a Run or
+      Charge Action within six metres of the target this Turn must make a Challenging (+0) Agility Test or fall over.

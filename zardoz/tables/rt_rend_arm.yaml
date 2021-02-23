@@ -1,0 +1,59 @@
+full_name: Rending Critical Effects - Arm
+slug: rt_rend_arm
+game: RT
+book: Core.258
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      The slashing attack tears anything free that was held in this arm.
+  - range: [2, 2]
+    name: 
+    effect: |
+      Deep cuts cause the target to drop whatever was held and inflict 1 level of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The shredding attack sends the target screaming in pain. He takes 2 levels of Fatigue and drops whatever was held in
+      that hand.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The attack flays the skin from the limb, filling the air with lood and the sounds of his screaming. The target falls prone
+      from the agony and takes 2 levels of Fatigue. The limb is useless for 1d10 Rounds.
+  - range: [5, 5]
+    name: 
+    effect: |
+      A bloody and very painful looking furrow is opened up in the target’s arm. The target takes 1d5 levels of Fatigue
+      and vomits all over the place in agony. He drops whatever was held and the limb is useless until medical attention is
+      received. The target also suffers Blood Loss.
+  - range: [6, 6]
+    name:
+    effect: |
+      The blow mangles flesh and muscle as it hacks into the target’s hand, liberating 1d5 fingers in the process (a roll of
+      a 5 means that the thumb has been sheared off ). The target takes 3 levels of Fatigue and must immediately make a
+      Challenging (+0) Toughness Test or lose the use of his hand.
+  - range: [7, 7]
+    name: 
+    effect: |
+      The attack rips apart skin, muscle, bone and sinew with ease, turning the target’s arm into a dangling ruin and inflicting
+      1d5 levels of Fatigue. The arm is broken and, until repaired, the target counts as having only one arm. In addition,
+      numerous veins have been severed and the target is now suffering from Blood Loss.
+  - range: [8, 8]
+    name:
+    effect: |
+      With an assortment of unnatural, wet ripping sounds, the arm flies free of the body trailing blood behind it in a crimson
+      arc. The target must immediately make a Challenging (+0) Toughness Test or die from shock. If he passes the Test,
+      he is Stunned for 1d10 Turns and suffers Blood Loss. He also takes 1d10 levels of Fatigue and now has only one arm.
+  - range: [9, 9]
+    name:
+    effect: |
+      The attack slices clean through the arm and into the torso, drenching the ground in blood and gore and killing the
+      target instantly.
+  - range: [10, 1000]
+    name:
+    effect: |
+      As in 9 (rather dead). However, as the arm falls to the ground its fingers spasm uncontrollably, pumping the trigger of any held
+      weapon. If the target was carrying a ranged weapon there is a 5% chance that a single randomly determined target
+      within 2d10 metres will be hit by these shots, in which case resolve a single hit from the target’s weapon as normal.
