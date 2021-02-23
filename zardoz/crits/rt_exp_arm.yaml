@@ -1,0 +1,59 @@
+full_name: Explosive Critical Effects - Arm
+slug: rt_exp_arm
+game: RT
+book: Core.254
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      The attack throws the limb backwards, painfully jerking it away from the body, inflicting 1 level of Fatigue.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The attack sends a fracture through the limb. The target drops anything held in the hand and takes 2 levels of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The explosion takes 1d5 fingers from the target’s hand. The target takes 3 levels of Fatigue and anything carried in the
+      hand is destroyed. If this is an explosive, it goes off. Messy.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The blast causes the target to howl in agony. He takes 1d5 levels of Fatigue, is Stunned for 1 Round, and the limb is
+      useless until medical attention is received.
+  - range: [5, 5]
+    name: 
+    effect: |
+      Fragments from the explosion tear into the target’s hand, ripping away flesh and muscle alike. He must immediately
+      Test Toughness or lose the hand. Even on a success, the hand is useless until medical attention is received. The target
+      takes 1d5 levels of Fatigue.
+  - range: [6, 6]
+    name:
+    effect: |
+      The explosive attack shatters the bone and mangles the flesh turning the target’s arm into a red ruin, inflicting 1d5
+      levels of Fatigue. The target’s arm is broken and, until repaired, the target counts as having only one arm. In addition,
+      the horrendous nature of the wound means that he now suffers from Blood Loss.
+  - range: [7, 7]
+    name: 
+    effect: |
+      In a violent hail of flesh, the arm is blown apart. The target must immediately make a Challenging (+0) Toughness
+      Test or die from shock. On a success, the target is Stunned for 1d10 rounds, takes 1d10 levels of Fatigue, and suffers
+      Blood Loss. He now only has one arm.
+  - range: [8, 8]
+    name:
+    effect: |
+      The arm disintegrates under the force of the explosion taking a good portion of the shoulder and chest with it. The
+      target is sent screaming to the ground, where he dies in a pool of his own blood and organs.
+  - range: [9, 9]
+    name:
+    effect: |
+      With a mighty bang the arm is blasted from the target’s body, killing the target instantly in a rain of blood droplets. In
+      addition, if the target was carrying a weapon with a power source in his hand (such as a power sword or chainsword)
+      then it explodes, dealing 1d10+5 Impact Damage to anyone within two metres.
+  - range: [10,1000]
+    name:
+    effect: |
+      As above, except if the target is carrying any ammunition it explodes dealing 1d10+5 Impact Damage to anyone within
+      1d10 metres (this is in addition to Damage caused by exploding power weapons noted above). If the target is carrying
+      any grenades or missiles, these too detonate on his person.
