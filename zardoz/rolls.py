@@ -21,7 +21,7 @@ from .utils import SUCCESS, FAILURE
 log = logging.getLogger()
 
 OPS = ['+', '-', '<=', '<', '>=', '>', '(', ')', r'#']
-DELIMS = [r'\s']
+DELIMS = [r'\s+']
 SPLIT_PAT = '|'.join(list(map(re.escape, OPS)) + DELIMS)
 
 
@@ -31,7 +31,7 @@ def split_tokens(word):
 
 
 def filter_tokens(tokens):
-    return [t for t in tokens if t and not re.match(r'\s', t)]
+    return [t for t in tokens if t and not re.match('|'.join(DELIMS), t)]
 
 
 def tokenize_roll(cmd: str):
