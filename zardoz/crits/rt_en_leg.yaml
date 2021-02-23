@@ -1,0 +1,56 @@
+full_name: Energy Critical Effects - Leg
+slug: rt_en_leg
+game: RT
+book: Core.253
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      A blow to the leg leaves the target gasping for air. The target gains 1 level of Fatigue.
+  - range: [2, 2]
+    name: 
+    effect: |
+      A grazing strike against the leg slows the target for a bit. The target halves all movement for 1 Round.
+  - range: [3, 3]
+    name:
+    effect: |
+      The blast breaks the target’s leg leaving him Stunned for 1 Round and halving all movement for 1d5 Rounds.
+  - range: [4, 4]
+    name: 
+    effect: |
+      A solid blow to the leg sends electric currents of agony coursing through the target. The target takes 1d5 levels of
+      Fatigue and halves all movement for 1d5 Rounds.
+  - range: [5, 5]
+    name: 
+    effect: |
+      The target’s leg endures horrific burn Damage, fusing clothing and armour with flesh and bone. The target takes 1 level
+      of Fatigue and moves at half speed for 2d10 Rounds.
+  - range: [6, 6]
+    name:
+    effect: |
+      The attack burns the target’s foot, charring the flesh and emitting a foul aroma. The target must successfully Test
+      Toughness or lose the foot. On a success, the target’s movement rates are halved until he receives medical attention. In
+      addition, the target takes 2 levels of Fatigue.
+  - range: [7, 7]
+    name: 
+    effect: |
+      The energy attack fries the leg, leaving it a mess of blackened flesh. The leg is broken and until repaired, the target
+      counts as having lost the leg. The target must take a Toughness Test or become Stunned for 1 Round. In addition the
+      target gains 1d5 levels of Fatigue. The target now only has one leg.
+  - range: [8, 8]
+    name:
+    effect: |
+      Energy sears through the bone, causing the leg to be severed. The target must take a Toughness Test or become
+      Stunned for 1 Round. In addition the target gains 1d10 levels of Fatigue and is suffering from Blood Loss. The target
+      now only has one leg.
+  - range: [9, 9]
+    name:
+    effect: |
+      The force of the attack reduces the leg to little more than a chunk of sizzling gristle. The target make a Challenging
+      (+0) Toughness Test or die from shock. The leg is utterly lost.
+  - range: [10,1000]
+    name:
+    effect: |
+      In a terrifying display of power, the leg immolates and fi e consumes the target completely. The target dies in a matter
+      of agonising seconds
