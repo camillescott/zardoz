@@ -208,6 +208,9 @@ class DieResult:
     def __str__(self):
         return f'{self.expr} ⤳ {self.result}'
 
+    def __int__(self):
+        return self.result
+
 
 class RollList:
     def __init__(self, expr, roll):

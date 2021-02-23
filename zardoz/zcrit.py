@@ -84,7 +84,7 @@ class CritCommands(commands.Cog, LoggingMixin):
 
     @commands.command(name='zcrit', help='Roll on a crit table.')
     async def zcrit(self, ctx, table: TableConvert = None,
-                               val: SimpleRollConvert = None):
+                               val: typing.Union[int, SimpleRollConvert] = None):
         if ctx.invoked_subcommand is not None:
             return
 
