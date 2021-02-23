@@ -1,0 +1,24 @@
+full_name: Hit Locations
+slug: rt_hit_loc
+game: RT
+book: Core.244
+die: 1d100
+rolls:
+  - range: [1, 10]
+    name: 
+    effect: Head
+  - range: [11, 20]
+    name: 
+    effect: Right Arm
+  - range: [21, 30]
+    name:
+    effect: Left Arm
+  - range: [31, 70]
+    name: 
+    effect: Body
+  - range: [71, 85]
+    name: 
+    effect: Right Leg
+  - range: [86, 100]
+    name:
+    effect: Left Leg
