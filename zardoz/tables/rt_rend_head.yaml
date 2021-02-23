@@ -33,7 +33,7 @@ rolls:
     name:
     effect: |
       As the blow rips violently across the target’s face—it takes with it an important feature. Roll 1d10 to see what the
-      target has lost. 1–3: Eye (see Permanent Effects on Cor.201), 4–7: Nose (permanently halve Fellowship), 8–10: Ear
+      target has lost. 1–3: Eye (see Permanent Effects on Core.201), 4–7: Nose (permanently halve Fellowship), 8–10: Ear
       (permanently reduce Fellowship by 1d10; the wound can always be hidden with hair.) In addition, the target is now
       suffering Blood Loss and takes 1d5 levels of Fatigue.
   - range: [7, 7]
