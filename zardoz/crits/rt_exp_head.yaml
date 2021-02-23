@@ -1,0 +1,55 @@
+full_name: Explosive Critical Effects - Head
+slug: rt_exp_head
+game: RT
+book: Core.255
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      The explosion leaves the target confused. He can take only a Half Action on his next Turn and takes 1 level of Fatigue.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The flash and noise leaves the target blind and deaf for 1 Round. The target takes 2 levels of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The detonation leaves the target’s face a bloody ruin from scores of small cuts. The target takes 2 levels of Fatigue.
+  - range: [4, 4]
+    name: 
+    effect: |
+      The force of the burst knocks the target to the ground and Stuns him for 1 Round. The target takes 2 levels of Fatigue.
+  - range: [5, 5]
+    name: 
+    effect: |
+      The explosion flays the flesh from the target’s face and bursts his eardrums with its force. The target is Stunned for
+      1d10 Rounds and is permanently deafened. The target takes 1d5 levels of Fatigue and can only take Half Actions for
+      1d5 hours. Finally, the target’s Fellowship drops by 1d10 due to hideous scarring.
+  - range: [6, 6]
+    name:
+    effect: |
+      The target’s head explodes under the force of the attack, leaving his headless corpse to spurt blood from the neck for
+      the next few minutes. Needless to say this is instantly fatal.
+  - range: [7, 7]
+    name: 
+    effect: |
+      Both head and body are blown into a mangled mess, instantly killing the target. In addition, if the target is carrying any
+      ammunition it explodes dealing 1d10+5 Impact Damage to any creatures within 1d5 metres. If the target was carrying
+      grenades or missiles, these too explode on the target’s person.
+  - range: [8, 8]
+    name:
+    effect: |
+      In a series of unpleasant explosions the target’s head and torso peel apart, leaving a gory mess on the ground. For the
+      rest of the fight, anyone moving over this spot must make a Challenging (+0) Agility Test or fall prone.
+  - range: [9, 9]
+    name:
+    effect: |
+      The target ceases to exist in any tangible way, entirely turning into a kind of crimson mist. You don’t get much deader
+      than this, except...
+  - range: [10,1000]
+    name:
+    effect: |
+      As in 9 (pink mist), except such is the unspeakably appalling manner in which the target was killed, that any of the target’s allies
+      who are within two metres of where the target stood must make an immediate Challenging (+0) Willpower Test or
+      spend their next Turn fleeing from the attacker.
