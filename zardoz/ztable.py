@@ -6,6 +6,7 @@
 # Author : Camille Scott <camille.scott.w@gmail.com>
 # Date   : 22.02.2021
 
+from collections import OrderedDict
 import glob
 import os
 import typing
@@ -57,7 +58,7 @@ def load_crit_tables(log=None):
     for file_path in files:
         table = RollTable(file_path)
         tables[table.slug] = table
-    return tables
+    return OrderedDict(sorted(tables.items(), key=lambda tup: tup[0]))
 
 
 TABLES = load_crit_tables()
@@ -109,9 +110,11 @@ class TableCommands(commands.Cog, LoggingMixin):
         except ValueError:
             await ctx.message.reply(f'Bad table value. Perils be upon ye.')
         else:
-            msg = f'**Roll:** {result}\n'\
-                  f'**Table:** {table.full_name} ({table.game}, {table.book})\n'\
-                  f'**Name:** {name}\n'\
-                  f'**Effect:** {effect}'
-            await ctx.message.reply(msg)
+            msg = [f'**Roll:** {result}',
+                   f'**Table:** {table.full_name} ({table.game}, {table.book})']
+            if name:
+                msg.append(f'**Name:** {name}')
+            msg.append(f'**Effect:** {effect}')
+
+            await ctx.message.reply('\n'.join(msg))
 
