@@ -1,8 +1,15 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# (c) Camille Scott, 2020
+# File   : state.py
+# License: MIT
+# Author : Camille Scott <camille.scott.w@gmail.com>
+# Date   : 22.02.2021
+
 from datetime import datetime
 from enum import IntEnum, auto
 
 from discord.ext import commands
-from tinydb import TinyDB, Query, where
 
 
 class GameMode(IntEnum):

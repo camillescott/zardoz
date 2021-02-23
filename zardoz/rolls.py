@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# (c) Camille Scott, 2021
+# File   : rolls.py
+# License: MIT
+# Author : Camille Scott <camille.scott.w@gmail.com>
+# Date   : 22.02.2021
+
 import dice
 from dice import DiceBaseException
 from discord.ext import commands
@@ -26,7 +34,14 @@ def filter_tokens(tokens):
     return [t for t in tokens if t and not re.match(r'\s', t)]
 
 
-def tokenize_roll(cmd):
+def tokenize_roll(cmd: str):
+    """tokenize_roll.
+
+    Parameters
+    ----------
+    cmd : str
+        Raw command string to tokenize.
+    """
 
     raw = []
 
