@@ -1,0 +1,53 @@
+full_name: Impact Critical Effects - Body
+slug: rt_imp_body
+game: RT
+book: Core.256
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      A blow to the target’s body steals the breath from his lungs. The target can take only a Half Action on his next Turn.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The impact punches the air from the target’s body, inflicting 1 level of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The attack breaks a rib and inflicts 2 levels of Fatigue. The target is also Stunned for 1 Round.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The blow batters the target, shattering ribs. The target takes 1d5 levels of Fatigue and is Stunned for 1 Round.
+  - range: [5, 5]
+    name: 
+    effect: |
+      A solid blow to the chest winds the target and he momentary doubles over in pain, clutching himself and crying in
+      agony. The target takes 1d5 levels of Fatigue and is Stunned for 2 Rounds.
+    name:
+    effect: |
+      The attack knocks the target sprawling on the ground. The target flies 1d5 metres away from the attacker and falls
+      prone (if the target strikes a wall of other solid object, he stops). The target takes 1d5 levels of Fatigue and is Stunned
+      for 2 Rounds.
+  - range: [7, 7]
+    name: 
+    effect: |
+      With an audible crack, 1d5 of the target’s ribs break. The target can either lay down and stay still awaiting medical
+      attention (a successful Medicae Test sets the ribs) or continue to take Actions, though each Round there is a 20% chance
+      that a jagged rib pierces a vital organ and kills the character instantly. The target takes 1d5 levels of Fatigue.
+  - range: [8, 8]
+    name:
+    effect: |
+      The force of the attack ruptures several of the target’s organs and knocks him down, gasping in wretched pain. The
+      target suffers Blood Loss and takes 1d10 levels of Fatigue.
+  - range: [9, 9]
+    name:
+    effect: |
+      The target jerks back from the force of the attack, throwing back his head and spewing out a jet of blood before
+      crumpling to the ground dead.
+  - range: [10, 1000]
+    name:
+    effect: |
+      As in 9 (spews out a jet of blood and fucking dies), except the target is thrown 1d10 metres away from the attack.
+      Anyone in the target’s path must make a Challenging (+0) Agility Test or be Knocked Down.

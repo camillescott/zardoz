@@ -1,0 +1,58 @@
+full_name: Impact Critical Effects - Arm
+slug: rt_imp_arm
+game: RT
+book: Core.256
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      The attack numbs the target’s limb causing him to drop anything held in that hand.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The strike leaves a deep bruise. The target takes 1 level of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The impact inflicts crushing pain and the target takes 1 level of Fatigue and drops whatever was held in that hand.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      The impact leaves the target reeling from pain. The target is Stunned for 1 Round. The limb is useless for 1d5 Rounds
+      and the target takes 1 level of Fatigue.
+  - range: [5, 5]
+    name: 
+    effect: |
+      Muscle and bone take a pounding as the attack rips into the arm. The target’s Weapon Skill and Ballistic Skill are both
+      halved (round down) for 1d10 Rounds. In addition, the target takes 1 level of Fatigue and must make an Agility Test or
+      drop anything held in that hand.
+  - range: [6, 6]
+    name:
+    effect: |
+      The attack pulverises the target’s hand, crushing and breaking 1d5 fingers (for the purposes of this Critical, a thumb
+      counts a finger). The target takes 1 level of Fatigue and must immediately make a Challenging (+0) Toughness Test
+      or lose the use of his hand.
+  - range: [7, 7]
+    name: 
+    effect: |
+      With a loud snap, the arm bone is shattered and left hanging limply at the target’s side, dribbling blood onto the
+      ground. The arm is broken and, until repaired, the target counts as having only one arm and takes 2 levels of Fatigue.
+  - range: [8, 8]
+    name:
+    effect: |
+      The force of the attack takes the arm off just below the shoulder, showering blood and gore across the ground. The
+      target must immediately make a Challenging (+0) Toughness Test or die from shock. If he passes the Test, he is still
+      Stunned for 1d10 rounds, takes 1d5 levels of Fatigue and is suffers from Blood Loss. He now only has one arm.
+  - range: [9, 9]
+    name:
+    effect: |
+      In a rain of blood, gore and meat, the target’s arm is removed from his body. Screaming incoherently, he twists about in
+      agony for a few seconds before collapsing to the ground and dying.
+  - range: [10, 1000]
+    name:
+    effect: |
+      As in 9 (arm removed, incoherent screaming, then dead), except as the arm is removed it is smashed apart by the force of 
+      the attack, and bone, clothing and armour
+      fragments fly bout like shrapnel. Anyone within 2 metres of the target suffers 1d5–3 Impact Damage to a random
+      location (see Table 9-8: Hit Locations, `rt_hit_loc`).

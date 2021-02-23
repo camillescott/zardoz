@@ -1,0 +1,58 @@
+full_name: Impact Critical Effects - Leg
+slug: rt_imp_leg
+game: RT
+book: Core.257
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      A light blow to the leg leaves the target gasping for air. The target takes 1 level of Fatigue.
+  - range: [2, 2]
+    name: 
+    effect: |
+      A grazing strike against the leg slows the target. The target halves all movement for 1 Round and takes 1 level of
+      Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The blow breaks the target’s leg leaving him Stunned for 1 Round and halving all movement for 1d5 Rounds. The
+      target takes 1 level of Fatigue.
+  - range: [4, 4]
+    name: 
+    effect: | 
+      A solid blow to the leg sends lightning agony coursing through the target. The target takes 1d5 levels of Fatigue and
+      halves all movement for 1d5 Rounds.
+  - range: [5, 5]
+    name: 
+    effect: |
+      A powerful impact causes micro fractures in the target’s bones, inflicting considerable agony. The target’s Agility is
+      reduced by –20 for 1d10 Rounds and he takes 1d5 levels of Fatigue.
+  - range: [6, 6]
+    name:
+    effect: |
+      Several of the tiny bones in the target’s foot snap like twigs with cracking noises. The target must make an
+      immediate Toughness Test or permanently lose the use of his foot. On a success, halve all movement until medical
+      attention is received. The target takes 2 levels of Fatigue.
+  - range: [7, 7]
+    name: 
+    effect: |
+      With a nasty crunch, the leg is broken and the target is knocked down mewling in pain. The target falls to the
+      ground with a broken leg and, until it is repaired, he counts as only having one leg. The target takes 2 levels of
+      Fatigue.
+  - range: [8, 8]
+    name:
+    effect: |
+      The force of the attack rips the lower half of the leg away in a stream of blood. The target must immediately make
+      a Challenging (+0) Toughness Test or die from shock. On a success, the target is Stunned for 1d10 rounds, takes
+      1d5 levels of Fatigue and suffers Blood Loss. He now only has one leg.
+  - range: [9, 9]
+    name:
+    effect: |
+      The hit rips apart the flesh of the leg, causing blood to spray out in all directions. Even as the target tries futilely to
+      stop the sudden flood of vital fluid, he alls to ground and dies in a spreading pool of gore.
+  - range: [10, 1000]
+    name:
+    effect: |
+      As in 9 (he's dead, Jim), but such is the agony of the target’s death that his piteous screams drowns out all conversation within
+      2d10 metres for the rest of the Round.
