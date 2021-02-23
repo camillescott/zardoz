@@ -1,0 +1,58 @@
+full_name: Explosive Critical Effects - Leg
+slug: rt_exp_leg
+game: RT
+book: Core.255
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      A glancing blast sends the character backwards one metre.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The force of the explosion takes the target’s feet out from under him. He lands Prone and takes 1 level of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The concussion cracks the target’s leg, leaving him Stunned for 1 Round and halving all movement for 1d5 Rounds.
+      The target takes 1 level of Fatigue.
+  - range: [4, 4]
+    name: 
+    effect: |
+      The explosion sends the target spinning through the air. The target travels 1d5 metres away from the explosion
+      and takes 1 level of Fatigue per metre travelled. It takes the target a Full Action to regain his feet and he halves all
+      movement for 1d10 Rounds.
+  - range: [5, 5]
+    name: 
+    effect: |
+      Explosive force removes part of the target’s foot and scatters it over a wide area. The target must make an immediate
+      Challenging (+0) Toughness Test or permanently lose the use of his foot, inflicting 1d5 levels of Fatigue. On a
+      success, the target takes 1d5 levels of Fatigue and halves his movement until he receives medical attention.
+  - range: [6, 6]
+    name:
+    effect: |
+      The concussive force of the blast shatters the target’s leg bones and splits apart his flesh, inflicting 1d10 levels of
+      Fatigue. The leg is broken and, until repaired, the target counts as having only one leg. In addition, the horrendous
+      nature of the wound means that he now suffers from Blood Loss.
+  - range: [7, 7]
+    name: 
+    effect: |
+      The explosion reduces the target’s leg into a hunk of smoking meat. The target must immediately make a Challenging
+      (+0) Toughness Test or die from shock. On a successful Test, the target is still Stunned for 1d10 Rounds, takes 1d10
+      levels of Fatigue and suffers Blood Loss. He now has only one leg.
+  - range: [8, 8]
+    name:
+    effect: |
+      The blast tears the leg from the body in a geyser of gore, sending him crashing to the ground, blood pumping from the
+      ragged stump: instantly fatal.
+  - range: [9, 9]
+    name:
+    effect: |
+      The leg explodes in an eruption of blood, killing the target immediately and sending tiny fragments of bone, clothing,
+      and armour hurtling off in all directions. Anyone within two metres of the target takes 1d10+2 Impact Damage.
+  - range: [10,1000]
+    name:
+    effect: |
+      As in 9 (dead, 1d10+2 Impact at 2 metres from leg hunks), except in addition, if the target is carrying any ammunition, it explodes
+      dealing 1d10+5 Impact Damage to anyone within 1d10 metres. If the target is carrying any grenades or missiles, these too detonate on the target’s person.
