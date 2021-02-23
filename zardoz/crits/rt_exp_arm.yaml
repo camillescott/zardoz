@@ -54,6 +54,6 @@ rolls:
   - range: [10,1000]
     name:
     effect: |
-      As above, except if the target is carrying any ammunition it explodes dealing 1d10+5 Impact Damage to anyone within
+      As in 9 (dead, ammunition explodes dealing 1d10+5 Impact at 1d10 metres), except if the target is carrying any ammunition it explodes dealing 1d10+5 Impact Damage to anyone within
       1d10 metres (this is in addition to Damage caused by exploding power weapons noted above). If the target is carrying
       any grenades or missiles, these too detonate on his person.

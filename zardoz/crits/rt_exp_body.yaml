@@ -1,0 +1,57 @@
+full_name: Explosive Critical Effects - Body
+slug: rt_exp_body
+game: RT
+book: Core.254
+die: 1d10
+rolls:
+  - range: [1, 1]
+    name: 
+    effect: | 
+      The target is blown backwards 1d5 metres and takes 1 level of Fatigue per metre travelled. He is Prone when he lands.
+  - range: [2, 2]
+    name: 
+    effect: |
+      The target is blown backwards 1d10 metres, taking 1 level of Fatigue per metre travelled. If he strikes a solid object, he
+      takes 1d5 additional levels of Fatigue.
+  - range: [3, 3]
+    name:
+    effect: |
+      The explosion destroys whatever armour protected the body. If the target wore none, the target is blown backwards
+      1d10 metres, as above but the target takes 2 levels of Fatigue for every metre travelled.
+  - range: [4, 4]
+    name: 
+    effect: |
+      The explosion sends the target sprawling to the ground. He takes 1d5 levels of Fatigue, is Stunned for 1 Round, and
+      must spend a Full Action to regain his feet.
+  - range: [5, 5]
+    name: 
+    effect: |
+      Concussion from the explosion knocks the target to the ground and tenderises his innards. The target falls down
+      Stunned for 1 Round and takes 1d10 levels of Fatigue.
+  - range: [6, 6]
+    name:
+    effect: |
+      Chunks of the target’s flesh are ripped free by the force of the attack leaving large, weeping wounds. The target is
+      Stunned for 1 Round, takes 1d10 levels of Fatigue and is now suffering Blood Loss.
+  - range: [7, 7]
+    name: 
+    effect: |
+      The explosive force of the attack ruptures the target’s flesh and scrambles his nervous system, knocking him to the
+      ground. The target falls down, is Stunned for 1d10 Rounds and takes 1d10 levels of Fatigue. In addition, he now
+      suffers Blood Loss and can only take Half Actions for the next 1d10 hours as he tries to regain control of his body.
+  - range: [8, 8]
+    name:
+    effect: |
+      The target’s chest explodes outward, disgorging a river of partially cooked organs onto the ground, killing him
+      instantly.
+  - range: [9, 9]
+    name:
+    effect: |
+      Pieces of the target’s body fly in all directions as he is torn into bloody gobbets by the attack. In addition, if the target
+      is carrying any ammunition, it explodes dealing 1d10+5 Impact Damage to anyone within 1d10 metres. If the target is
+      carrying any grenades or missiles, these too detonate on the target’s person.
+  - range: [10,1000]
+    name:
+    effect: |
+      As in 9 (dead, ammunition explodes dealing 1d10+5 Impact at 1d10 metres), except anyone within 1d10 metres of the target is drenched in gore and must make a Challenging (+0)
+      Agility Test or suffer a –10 penalty to Weapon Skill and Ballistic Skill Tests for 1 Round as blood fouls their sight.
