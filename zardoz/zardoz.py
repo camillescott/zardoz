@@ -38,7 +38,7 @@ from .logging import setup as setup_logger
 from . import __version__, __splash__, __about__, __testing__
 from .database import DatabaseCache
 from .utils import default_log_file, default_database_dir
-from .zcrit import CritCommands
+from .ztable import TableCommands
 from .zhistory import HistoryCommands
 from .zmode import ModeCommands
 from .zroll import RollCommands
@@ -118,7 +118,7 @@ def main():
         await ctx.message.reply(msg)
 
     bot.add_cog(RollCommands(bot, DB))
-    bot.add_cog(CritCommands(bot, DB))
+    bot.add_cog(TableCommands(bot, DB))
     bot.add_cog(VarCommands(bot, DB))
     bot.add_cog(ModeCommands(bot, DB))
     bot.add_cog(HistoryCommands(bot, DB))
