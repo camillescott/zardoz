@@ -21,11 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import dice
-
-import discord
-from discord.ext import commands
-
 import argparse
 import json
 import os
@@ -33,16 +28,11 @@ from pathlib import Path
 import sys
 import textwrap
 
-from .logging import setup as setup_logger
-
 from . import __version__, __splash__, __about__, __testing__
-from .database import DatabaseCache
-from .utils import default_log_file, default_database_dir
-from .ztable import TableCommands
-from .zhistory import HistoryCommands
-from .zmode import ModeCommands
-from .zroll import RollCommands
-from .zvars import VarCommands
+
+from .rt.simulate import zimulate
+from .utils import default_log_file, default_database_dir, EnumAction
+
 
 
 class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
@@ -52,32 +42,166 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 
 def main():
 
+    from .rt.combat import COMBAT_ACTIONS
+    from .rt.weapons import (WeaponClass, WeaponType, DamageType,
+                             Craftsmanship, ItemAvailability)
+
     parser = argparse.ArgumentParser(
         description=f'{__splash__}\n{__about__}',
         formatter_class=CustomFormatter
     )
-    parser.add_argument(
+    subparsers = parser.add_subparsers()
+
+    bot = subparsers.add_parser('bot')
+    bot.add_argument(
         '--secret-token',
         help='The secret token for the bot, '\
              'from the discord developer portal. '\
              'If you have set $ZARDOZ_TOKEN, this '\
              'option will override that.'
     )
-    parser.add_argument(
+    bot.add_argument(
         '--database-dir',
         type=lambda p: Path(p).absolute(),
         default=default_database_dir(debug=__testing__),
         help='Directory for the bot databases. Default follows the '\
              'XDG specifiction.'
     )
-    parser.add_argument(
+    bot.add_argument(
         '--log',
         type=lambda p: Path(p).absolute(),
         default=default_log_file(debug=__testing__),
         help='Path to the log file. Default follows the '\
              'XDG specifiction.'
     )
+    bot.set_defaults(func=dize)
+
+    simulate = subparsers.add_parser('zimulate')
+    simulate.add_argument(
+        '-BS',
+        '--ballistic-skill',
+        default=40,
+        type=int
+    )
+    simulate.add_argument(
+        '--actions',
+        nargs='+',
+        choices=COMBAT_ACTIONS.keys()
+    )
+    simulate.add_argument(
+        '--target-range',
+        default=10,
+        type=int
+    )
+    simulate.add_argument(
+        '--name',
+        default='RT Weapon',
+    )
+    simulate.add_argument(
+        '--availability',
+        default='Scarce',
+        action=EnumAction,
+        type=ItemAvailability
+    )
+    simulate.add_argument(
+        '--weapon-class',
+        default='Pistol',
+        action=EnumAction,
+        type=WeaponClass
+    )
+    simulate.add_argument(
+        '--type',
+        default='Las',
+        type=WeaponType,
+        action=EnumAction
+    )
+    simulate.add_argument(
+        '--range',
+        default=20
+    )
+    simulate.add_argument(
+        '--rof-single',
+        default=True,
+        type=bool
+    )
+    simulate.add_argument(
+        '--rof-semi',
+        default=0,
+        type=int
+    )
+    simulate.add_argument(
+        '--rof-auto',
+        default=0,
+        type=int
+    )
+    simulate.add_argument(
+        '--damage-d10',
+        default=1,
+        type=int
+    )
+    simulate.add_argument(
+        '--damage-bonus',
+        default=3,
+        type=int
+    )
+    simulate.add_argument(
+        '--damage-type',
+        default='Energy',
+        type=DamageType,
+        action=EnumAction
+    )
+    simulate.add_argument(
+        '--pen',
+        default=0,
+        type=int
+    )
+    simulate.add_argument(
+        '--clip',
+        default=10,
+        type=int
+    )
+    simulate.add_argument(
+        '--reload-time',
+        default=1.0,
+        type=float
+    )
+    simulate.add_argument(
+        '--mass',
+        default=2.0,
+        type=float
+    )
+    simulate.add_argument(
+        '--craftsmanship',
+        type=Craftsmanship,
+        action=EnumAction
+    )
+    simulate.add_argument(
+        '--n-trials',
+        '-N',
+        default=10000,
+        type=int
+    )
+    simulate.add_argument(
+        '--output',
+        default='text',
+        choices = ['text', 'image']
+    )
+    simulate.set_defaults(func=zimulate)
+
     args = parser.parse_args()
+    args.func(args)
+
+
+def dize(args):
+
+    from .database import DatabaseCache
+    from .logging import setup as setup_logger
+    
+    from .ztable import TableCommands
+    from .zhistory import HistoryCommands
+    from .zmode import ModeCommands
+    from .zroll import RollCommands
+    from .zvars import VarCommands
 
     log = setup_logger(args.log)
 
