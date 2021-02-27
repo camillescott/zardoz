@@ -12,6 +12,7 @@ from datetime import datetime
 import functools
 import os
 from pathlib import Path
+import random
 
 import discord
 from xdg import xdg_data_home
@@ -28,6 +29,22 @@ _KWArgs = Dict[str, Any]
 
 FAILURE = 'F 🛇'
 SUCCESS = 'S ✅'
+
+
+def d10():
+    return random.randint(1, 10)
+
+
+def d100():
+    return random.randint(1, 100)
+
+
+def Nd10(n=1):
+    return [random.randint(1,10) for _ in range(n)]
+
+
+def Nd100(n=1):
+    return [random.randint(1,100)  for _ in range(n)]
 
 
 def default_database_dir(debug=False):
