@@ -15,7 +15,7 @@ import dice
 from ..utils import require_kwargs, reverse_number, d10, d100, Nd10
 from .character import Characteristic
 from .combat import (CombatAction, CharacteristicBonus, ExtraHitsBonus,
-                     FullAutoBurst, SemiAutoBurst)
+                     FullAutoBurst, SemiAutoBurst, HIT_LOC_TABLE)
 
 
 class WeaponClass(IntEnum):
@@ -157,14 +157,38 @@ class InstanceMixin:
         super().__init__(**kwargs)
 
 
+class DamageRoll:
+
+    def __init__(self, dice, bonus):
+        self.bonus = bonus
+        self.fury_bonus = 0
+        self.dice = dice
+
+    def replace_lowest(self, replacement):
+        if min(self.dice) < replacement:
+            self.dice[self.dice.index(min(self.dice))] = replacement
+
+    def __int__(self):
+        return sum(self.dice) + self.bonus + self.fury_bonus
+
+    def add_fury(self, extra_fury):
+        self.fury_bonus += extra_fury
+
+    def add_bonus(self, extra_bonus):
+        self.bonus += extra_bonus
+
+
+
 class AttackContext:
 
-    def __init__(self, test_base, target_range, actions = [], quiet: bool = True):
+    def __init__(self, characteristic, test_base, weapon, target_range, actions = [], quiet: bool = True):
+        self.characteristic = characteristic
         self.test_base = test_base
+        self.weapon = weapon
         self._test_bonus = 0
         self.target_range = target_range
         self.hits_base = 0
-        self.extra_hits = 0
+        self.hits_extra = 0
         self.actions = actions
 
         self.attack_roll = 0
@@ -177,11 +201,37 @@ class AttackContext:
     def add_test_bonus(self, extra):
         self._test_bonus += extra
 
+    def add_hits(self, extra):
+        self.hits_extra += extra
+
+    def add_damage_roll(self, roll):
+        self.damage_rolls.append(roll)
+
     @property
     def test_bonus(self):
-        return max(60, self._test_bonus)
+        return min(60, self._test_bonus)
 
+    @property
+    def test(self):
+        return self.test_base + self.test_bonus
 
+    @property
+    def hits(self):
+        if SemiAutoBurst in self.actions:
+            hits_max = self.weapon.rof_semi
+        elif FullAutoBurst in self.actions:
+            hits_max = self.weapon.rof_auto
+        else:
+            hits_max = int(self.weapon.rof_single)
+        return min(self.hits_base + self.hits_extra, hits_max)
+
+    @property
+    def success(self):
+        return self.attack_roll <= self.test
+
+    @property
+    def total_damage(self):
+        return sum((int(roll) for roll in self.damage_rolls))
 
 
 class WeaponInstance(InstanceMixin):
@@ -227,133 +277,121 @@ class WeaponInstance(InstanceMixin):
         return self.weapon_model.rof[2]
 
     def _attack(self, char_val, actions=[], target_range: int = 10, quiet: bool = True):
-        ctx = AttackContext(char_val, target_range, quiet=quiet)
+
+        def _print(*args, **kwargs):
+            if not quiet:
+                print(*args, **kwargs)
+
+        #
+        # Sanitize parameters
+        #
 
         if not isinstance(actions, collections.Sequence):
-            actions = [actions]
+            actions = set([actions])
+        else:
+            actions = set(actions)
 
         assert len(actions) < 3
 
-        if SemiAutoBurst in actions and not semi:
+        if SemiAutoBurst in actions and not self.rof_semi:
             raise ValueError(f'{self.name} does not support semi-auto')
-        if FullAutoBurst in actions and not auto:
+        if FullAutoBurst in actions and not self.rof_auto:
             raise ValueError(f'{self.name} does not support full-auto')
         if target_range / self.range > 4:
             raise ValueError(f'{self.name} cannot fire more than {self.range * 4}m')
 
-        test = char_val
-        test_bonus = 0
+        # setup the attack context
+        ctx = AttackContext(self.test_characteristic, char_val, self, target_range, actions=actions, quiet=quiet)
 
         # apply characteristic bonuses
-        # check aim plus inaccurate
         for action in actions:
             for bonus in action.before_effects:
-                if isinstance(bonus, CharacteristicBonus) and bonus.characteristic == self.test_characteristic:
-                    test_bonus += int(bonus)
-                    if not quiet:
-                        print(f'add {bonus} for {test}')
+                bonus(ctx)
+                _print(bonus)
         # now we'd apply specials from the weapon itself in the same way
 
         # figure ranges
         if target_range <= 2:
             # point blank
-            test_bonus += 30
+            _print('Point blank: +30')
+            ctx.add_test_bonus(30)
         elif target_range < (self.range / 2):
             # short range
-            test_bonus += 10
+            ctx.add_test_bonus(10)
+            _print('Close: +10')
         elif target_range > (self.range * 3):
             # extreme range
-            test_bonus -= 30
+            ctx.add_test_bonus(-30)
+            _print('Extreme: -30')
         elif target_range > (self.range * 2):
             # long range
-            test_bonus -= 10
+            ctx.add_test_bonus(-10)
+            _print('Long: -10')
+        else:
+            _print('Normal range.')
 
-        if not quiet:
-            print(f'added range bonus for {test}')
-
-        test_bonus = min(test_bonus, 60)
-        test = test + test_bonus
-        if not quiet:
-            print(f'final bonus: {test}')
+        _print(f'final test: {ctx.test_base} + {ctx.test_bonus}')
 
         # roll it
-        roll = d100()
-        delta = abs(test - roll)
-        degrees = delta // 10
+        ctx.attack_roll = d100()
+        delta = abs(ctx.test - ctx.attack_roll)
+        ctx.attack_degrees = delta // 10
 
-        if not quiet:
-            print(f'rolled {roll} for {degrees} degrees')
+        _print(f'rolled {ctx.attack_roll} for {ctx.attack_degrees} degrees')
 
         # TODO: check jamming and exploding
 
-        if roll > test:
-            # failure
+        if not ctx.success:
             # damage, effective_char, degrees, hits, locations, message
-            return 0, test, degrees, 0, [], "Failed to hit"
-
-        hits = 1
+            return 0, ctx.test, ctx.attack_degrees, 0, [], "Failed to hit"
+        else:
+            ctx.hits_base = 1
 
         # apply action bonuses
         for action in actions:
             for bonus in action.after_effects:
-                if isinstance(bonus, ExtraHitsBonus):
-                    if action is SemiAutoBurst:
-                        hits += min(bonus(dos=degrees), semi)
-                    if action is FullAutoBurst:
-                        hits += min(bonus(dos=degrees), auto)
+                bonus(ctx)
+                _print(bonus)
 
-        if not quiet:
-            print(f'hits after bonus: {hits}')
+        _print(f'hits after bonus: {ctx.hits}')
 
         # get hit location with reverse_number
         # for multiple hits 
 
         # roll for damage
-        damage = 0
-        _hits = hits
-        while _hits > 0:
-            if not quiet:
-                print(f'roll hit {_hits}')
+        for hit_counter in range(ctx.hits):
+            _print(f'roll hit {hit_counter + 1}')
 
-            rolls = Nd10(n=self.damage_roll)
+            roll = DamageRoll(Nd10(n=self.damage_roll), self.damage_bonus)
 
-            if not quiet:
-                print(f'damage rolls: {rolls}')
+            _print(f'initial damage roll: {roll.dice}')
 
             # replace lowest with DoS if its lower
-            if min(rolls) < degrees:
-                rolls[rolls.index(min(rolls))] = degrees
+            roll.replace_lowest(ctx.attack_degrees)
 
-            if not quiet:
-                print(f'damage rolls after replace: {rolls}')
+            _print(f'damage roll after replace: {roll.dice}')
 
-            damage += sum(rolls) + self.damage_bonus
+            # TODO: apply weapon special roll bonuses
 
-            if not quiet:
-                print(f'damage before fury: {damage}')
+            ctx.add_damage_roll(roll)
+            _print(f'damage before fury: {int(roll)}')
 
-            fury = 10 in rolls
+            fury = 10 in roll.dice
             while (fury):
-                fury_roll = d100() <= test
-
-                if not quiet:
-                    print(f'fury! rolled {fury_roll}')
+                fury_roll = d100() <= ctx.test
 
                 if fury_roll:
                     fury_damage = d10()
 
-                    if not quiet:
-                        print(f'fury did {fury_damage}')
+                    _print(f'fury! rolled {fury_damage}')
 
-                    damage += fury_damage
+                    roll.add_fury(fury_damage)
                     fury = fury_damage == 10
                 else:
                     fury = False
 
-            _hits -= 1
-
-        if not quiet:
-            print(f'final damage: {damage}')
+        _print(f'final damage: {ctx.total_damage}')
                 
 
-        return damage, test, degrees, hits, [], "Hit!"
+        locs = HIT_LOC_TABLE.get_location(ctx.attack_roll, ctx.hits)
+        return ctx.total_damage, ctx.test, ctx.attack_degrees, ctx.hits, locs, "Hit!"
