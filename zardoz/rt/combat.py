@@ -20,8 +20,8 @@ class CharacteristicBonus:
     def __int__(self):
         return self.bonus
 
-    def __call__(self, **kwargs):
-        return int(self)
+    def __call__(self, ctx, **kwargs):
+        ctx.test_bonus += bonus
 
 
 class ExtraHitsBonus:
@@ -29,7 +29,7 @@ class ExtraHitsBonus:
     def __init__(self, dos_div: int = 1):
         self.dos_div = 1
 
-    def __call__(self, *, dos: int, **kwargs):
+    def __call__(self, ctx, *, dos: int, **kwargs):
         return dos // self.dos_div
 
 
@@ -91,7 +91,7 @@ FullAutoBurst = CombatAction('Full Auto Burst',
 
 SemiAutoBurst = CombatAction('Semi Auto Burst',
                              before_effects = [
-                                 CharacteristicBonus(Characteristic.BallisticSkill, 20)
+                                 CharacteristicBonus(Characteristic.BallisticSkill, 10)
                              ],
                              after_effects = [
                                  ExtraHitsBonus(dos_div=2)
