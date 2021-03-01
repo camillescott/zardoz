@@ -329,15 +329,15 @@ class WeaponInstance(InstanceMixin):
             # point blank
             _print('Point blank: +30')
             ctx.add_test_bonus(30)
-        elif target_range < (self.range / 2):
+        elif target_range <= (self.range / 2):
             # short range
             ctx.add_test_bonus(10)
             _print('Close: +10')
-        elif target_range > (self.range * 3):
+        elif target_range >= (self.range * 3):
             # extreme range
             ctx.add_test_bonus(-30)
             _print('Extreme: -30')
-        elif target_range > (self.range * 2):
+        elif target_range >= (self.range * 2):
             # long range
             ctx.add_test_bonus(-10)
             _print('Long: -10')
