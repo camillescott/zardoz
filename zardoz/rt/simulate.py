@@ -6,13 +6,14 @@
 # Author : Camille Scott <camille.scott.w@gmail.com>
 # Date   : 27.02.2021
 
+from contextlib import contextmanager
+
 
 from .combat import COMBAT_ACTIONS
 from .weapons import (WeaponClass, WeaponType, DamageType, Craftsmanship,
                                ItemAvailability, Weapon, WeaponInstance)
 
 def zimulate(args):
-    import plotille
 
     weapon_model = Weapon(
         name=args.name,
@@ -40,13 +41,16 @@ def zimulate(args):
     maxd = results.damage.max()
     medd = int(results.damage[results['damage'] > 0].median())
 
-    print(f'Median damage: {medd}')
-    print(f'Max damage: {maxd}')
-    print(f'Success ratio: {sr}')
-    print(plotille.histogram(results.damage[results.damage > 0],
-                             X_label='Damage',
-                             x_min=0,
-                             height=30))
+    actions_str = ', '.join([action.name for action in combat_actions])
+    title = f'{weapon_instance.name} @ {actions_str}: SR={sr:.3f}, Max={maxd}, Med={medd}\n'\
+            f'BS={args.ballistic_skill}, Range={args.target_range}, N={args.n_trials:,} '
+    print(title)
+
+    if args.plot is not None:
+        if args.plot == 'text':
+            plot_simulation_plottile(results)
+        else:
+            plot_simulation_mpl(results, title=title)
 
 
 def simulate_attack(instance, BS, target_range, actions, N=10000):
@@ -63,18 +67,40 @@ def simulate_attack(instance, BS, target_range, actions, N=10000):
     return pd.DataFrame({'damage': damages, 'test': tests})
 
 
-def simulate_and_plot(weapon_instance, BS, target_range, actions=[], N=100000):
-    import ficus
+def plot_simulation_mpl(results_df, title='', filename=None, **kwargs):
+    import matplotlib as mpl
+    mpl.use('module://zardoz.mpl-kitty')
+    import matplotlib.pyplot as plt
+    plt.ioff()
+    #import ficus
     import seaborn as sns
 
-    damages = simulate_attack(weapon_instance, BS, target_range, actions, N=N)
-    sr = sum(damages.damage > 0) / N
-    maxd = damages.damage.max()
-    medd = damages.damage[damages['damage'] > 0].median()
-
+    #filename=f'BS{BS}_{weapon_instance.name}_R{target_range}_.png'
     sns.set_style('ticks')
-    with ficus.FigureManager(show=True, figsize=(12,8), filename=f'BS{BS}_{weapon_instance.name}_R{target_range}_.png') as (fig, ax):
-        sns.kdeplot(data=damages[damages['damage'] != 0], x='damage', fill=True, ax=ax)
+    sns.set_context('talk')
+
+    with mpl_dark_mode():
+        fig, ax = plt.subplots()
+        sns.kdeplot(data=results_df[results_df['damage'] != 0], x='damage', fill=True, ax=ax)
         sns.despine(ax=ax, offset=10)
         ax.set_xlabel('Damage')
-        ax.set_title(f'{weapon_instance.name}, {[action.name for action in actions]}, BS={BS}, Range={target_range}\nN={N:,} ({sr:4f} SR), Max={maxd}, Med={medd}')
+        ax.set_title(title)
+        plt.show()
+
+
+def plot_simulation_plottile(results_df, title='', **kwargs):
+    import plotille
+    print(plotille.histogram(results_df.damage[results_df.damage > 0],
+                             X_label='Damage',
+                             x_min=0,
+                             height=30))
+
+
+@contextmanager
+def mpl_dark_mode(*args, **kwargs):
+    import matplotlib.pyplot as plt
+    line_color = 'white'
+    with plt.rc_context({'text.color': line_color, 'axes.labelcolor': line_color,
+                         'xtick.color': line_color, 'ytick.color': line_color,
+                         'axes.edgecolor': line_color}):
+        yield line_color

@@ -182,7 +182,7 @@ def main():
         type=int
     )
     simulate.add_argument(
-        '--output',
+        '--plot',
         default='text',
         choices = ['text', 'image']
     )
