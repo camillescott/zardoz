@@ -99,25 +99,26 @@ def main():
     )
     simulate.add_argument(
         '--availability',
-        default='Scarce',
+        default=ItemAvailability.Scarce,
         action=EnumAction,
         type=ItemAvailability
     )
     simulate.add_argument(
         '--weapon-class',
-        default='Pistol',
+        default=WeaponClass.Pistol,
         action=EnumAction,
         type=WeaponClass
     )
     simulate.add_argument(
         '--type',
-        default='Las',
+        default=WeaponType.Las,
         type=WeaponType,
         action=EnumAction
     )
     simulate.add_argument(
         '--range',
-        default=20
+        default=20,
+        type=int
     )
     simulate.add_argument(
         '--rof-single',
@@ -146,7 +147,7 @@ def main():
     )
     simulate.add_argument(
         '--damage-type',
-        default='Energy',
+        default=DamageType.Energy,
         type=DamageType,
         action=EnumAction
     )
@@ -172,6 +173,7 @@ def main():
     )
     simulate.add_argument(
         '--craftsmanship',
+        default=Craftsmanship.Common,
         type=Craftsmanship,
         action=EnumAction
     )
