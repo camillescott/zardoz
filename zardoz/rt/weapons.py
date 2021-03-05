@@ -150,6 +150,10 @@ class Weapon(Item):
         auto = str(self.rof[2]) if self.rof[2] else '-'
         return f'{single}/{semi}/{auto}'
 
+    @property
+    def pretty_damage_type(self):
+        return self.damage_type.name[0]
+
 
 class InstanceMixin:
 
@@ -256,7 +260,7 @@ class WeaponInstance(InstanceMixin):
                          quantity=quantity)
 
     def __str__(self):
-        return f'<{self.name} {self.damage_roll}d10+{self.damage_bonus} {self.pretty_rof} {self.range}m>'
+        return f'<{self.name} {self.damage_roll}d10+{self.damage_bonus}{self.pretty_damage_type} {self.pretty_rof} {self.range}m>'
 
     @property
     def range(self):
@@ -285,6 +289,10 @@ class WeaponInstance(InstanceMixin):
     @property
     def pretty_rof(self):
         return self.weapon_model.pretty_rof
+
+    @property
+    def pretty_damage_type(self):
+        return self.weapon_model.pretty_damage_type
 
     @property
     def rof_auto(self):
