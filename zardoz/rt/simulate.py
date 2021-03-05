@@ -7,6 +7,7 @@
 # Date   : 27.02.2021
 
 from contextlib import contextmanager
+import os
 
 
 from .combat import COMBAT_ACTIONS
@@ -44,7 +45,6 @@ def zimulate(args):
     actions_str = ', '.join([action.name for action in combat_actions])
     title = f'{weapon_instance.name} @ {actions_str}: SR={sr:.3f}, Max={maxd}, Med={medd}\n'\
             f'BS={args.ballistic_skill}, Range={args.target_range}, N={args.n_trials:,} '
-    print(title)
 
     if args.plot is not None:
         if args.plot == 'text':
@@ -69,7 +69,10 @@ def simulate_attack(instance, BS, target_range, actions, N=10000):
 
 def plot_simulation_mpl(results_df, title='', filename=None, **kwargs):
     import matplotlib as mpl
-    mpl.use('module://zardoz.mpl-kitty')
+    if os.environ['TERM'] == 'xterm-kitty':
+        mpl.use('module://zardoz.mpl-kitty')
+    else:
+        mpl.use('module://zardoz.mpl-sixel')
     import matplotlib.pyplot as plt
     plt.ioff()
     #import ficus
@@ -80,7 +83,7 @@ def plot_simulation_mpl(results_df, title='', filename=None, **kwargs):
     sns.set_context('talk')
 
     with mpl_dark_mode():
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(12,8))
         sns.kdeplot(data=results_df[results_df['damage'] != 0], x='damage', fill=True, ax=ax)
         sns.despine(ax=ax, offset=10)
         ax.set_xlabel('Damage')
@@ -90,6 +93,7 @@ def plot_simulation_mpl(results_df, title='', filename=None, **kwargs):
 
 def plot_simulation_plottile(results_df, title='', **kwargs):
     import plotille
+    print(title)
     print(plotille.histogram(results_df.damage[results_df.damage > 0],
                              X_label='Damage',
                              x_min=0,
@@ -100,7 +104,8 @@ def plot_simulation_plottile(results_df, title='', **kwargs):
 def mpl_dark_mode(*args, **kwargs):
     import matplotlib.pyplot as plt
     line_color = 'white'
-    with plt.rc_context({'text.color': line_color, 'axes.labelcolor': line_color,
+    with plt.rc_context({'font.family': 'monospace', 'text.color': line_color, 'axes.labelcolor': line_color,
                          'xtick.color': line_color, 'ytick.color': line_color,
-                         'axes.edgecolor': line_color}):
+                         'axes.edgecolor': line_color, 'axes.facecolor': '#000000',
+                         'figure.facecolor': '#000000'}):
         yield line_color
