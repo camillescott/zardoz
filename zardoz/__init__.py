@@ -2,7 +2,7 @@ import os
 
 __author__ = """Camille Scott"""
 __email__ = 'cswel@ucdavis.edu'
-__version__ = '0.7.1'
+__version__ = '0.8.0'
 
 __splash__ = f'''
  _____             _      _____
