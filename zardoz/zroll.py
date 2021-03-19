@@ -13,8 +13,8 @@ from discord.ext import commands
 
 from .database import fetch_guild_db
 from .logging import LoggingMixin
-from .rolls import (RollHandler, QuietRollHandler, SekretRollHandler,
-                    RollList, DiceDelta)
+from .rolls import (RollHandler, QuietRollHandler, SekretRollHandler, RerollHandler,
+                    RollList, DiceDelta, tokenize_roll)
 from .utils import handle_http_exception
 
 
@@ -76,7 +76,7 @@ class RollCommands(commands.Cog, LoggingMixin):
     @commands.command(name='zr', help='Reroll previous roll')
     @fetch_guild_db
     @handle_http_exception
-    async def zroll_reroll(self, ctx, member: typing.Optional[discord.Member]):
+    async def zroll_reroll(self, ctx, member: typing.Optional[discord.Member], *, args=''):
         if member is None:
             member = ctx.author
 
@@ -86,7 +86,18 @@ class RollCommands(commands.Cog, LoggingMixin):
             await ctx.message.reply(f'Ope, no roll history for {member}.')
         else:
             cmd = saved['roll']
-            roll = RollHandler(ctx, self.log, ctx.variables, cmd,
-                               game_mode=ctx.game_mode)
+            _, tag = tokenize_roll(args)
+            if not tag:
+                tag = saved['tag']
+            tag = '# ' + tag
+
+            roll = RerollHandler(ctx, self.log, ctx.variables, cmd + tag,
+                                 game_mode=ctx.game_mode)
+
+            if member == ctx.author:
+                target = 'self'
+            else:
+                target = member.nick if member.nick else member.name
+
             await roll.add_to_db(ctx.guild_db)
-            await ctx.message.reply(f'Reroll {roll.msg()}')
+            await ctx.message.reply(f'Reroll {roll.msg(target)}')

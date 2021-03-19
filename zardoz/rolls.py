@@ -197,6 +197,19 @@ class SekretRollHandler(RollHandler):
         return '\n'.join((header, result))
 
 
+class RerollHandler(RollHandler):
+
+    def msg(self, reroll_target):
+        header = f':game_die: {self.ctx.author.mention} rerolls {reroll_target}' + (f': *{self.tag}*' if self.tag else '')
+        result = [f'***Request:***  `{" ".join(self.tokens)}`\n',
+                  f'***Rolled out:***  `{self.expr}`\n',
+                  f'***Result:***\n```{self.result.describe(mode=self.game_mode)}```']
+        result = ''.join(result)
+        msg = '\n'.join((header, result))
+
+        return msg
+
+
 class DieResult:
 
     def __init__(self, expr, result):
