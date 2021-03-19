@@ -13,7 +13,6 @@ with open('HISTORY.rst') as history_file:
 requirements = ['discord.py',
                 'rich',
                 'dice',
-                'tinydb',
                 'pyyaml',
                 'xdg',
                 'aiofiles',
