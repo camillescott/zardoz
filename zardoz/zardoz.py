@@ -242,7 +242,7 @@ def dize(args):
     @bot.command(name='zabout', help='Project info.')
     async def zabout(ctx):
         msg = f'version: {__version__}\n'\
-              f'source: https://github.com/camillescott/zardoz\n'\
+              f'source: https://github.com/camillescott/zardoz/releases/latest\n'\
               f'active installs: {len(bot.guilds)}'
         await ctx.message.reply(msg)
 
