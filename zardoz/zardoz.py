@@ -43,8 +43,9 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 def main():
 
     from .rt.combat import COMBAT_ACTIONS
+    from .rt.items import ItemAvailability
     from .rt.weapons import (WeaponClass, WeaponType, DamageType,
-                             Craftsmanship, ItemAvailability)
+                             Craftsmanship)
 
     parser = argparse.ArgumentParser(
         description=f'{__splash__}\n{__about__}',

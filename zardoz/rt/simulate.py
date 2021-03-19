@@ -10,13 +10,14 @@ from contextlib import contextmanager
 import os
 
 
-from .combat import COMBAT_ACTIONS
+from .combat import player_attack, COMBAT_ACTIONS
+from .items import ItemAvailability
 from .weapons import (WeaponClass, WeaponType, DamageType, Craftsmanship,
-                               ItemAvailability, Weapon, WeaponInstance)
+                      PlayerWeapon, PlayerWeaponInstance)
 
 def zimulate(args):
 
-    weapon_model = Weapon(
+    weapon_model = PlayerWeapon(
         name=args.name,
         availability=args.availability,
         weapon_class=args.weapon_class,
@@ -32,7 +33,7 @@ def zimulate(args):
         mass=args.mass
     )
 
-    weapon_instance = WeaponInstance(weapon_model, craftsmanship=args.craftsmanship)
+    weapon_instance = PlayerWeaponInstance(weapon_model, craftsmanship=args.craftsmanship)
     combat_actions = [COMBAT_ACTIONS.get(action) for action in args.actions] \
                      if args.actions is not None else []
 
@@ -60,7 +61,7 @@ def simulate_attack(instance, BS, target_range, actions, N=10000):
     damages, tests = [], []
     with alive_bar(N, title=f'{instance}') as bar:
         for _ in range(N):
-            dmg, test, _, _, _, _ = instance._attack(BS, actions=actions, target_range=target_range)
+            dmg, test, _, _, _, _ = player_attack(instance, BS, actions=actions, target_range=target_range)
             damages.append(dmg)
             tests.append(test)
             bar()
