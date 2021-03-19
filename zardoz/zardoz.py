@@ -28,8 +28,9 @@ from pathlib import Path
 import sys
 import textwrap
 
-from . import __version__, __splash__, __about__, __testing__
+from discord.ext import commands
 
+from . import __version__, __splash__, __about__, __testing__
 from .rt.simulate import zimulate
 from .utils import default_log_file, default_database_dir, EnumAction
 
@@ -230,7 +231,8 @@ def dize(args):
             await super().close()
             log.info('Bot closed.')
 
-    bot = ZardozBot(command_prefix='/')
+    prefix = '/' if not __testing__ else '!'
+    bot = ZardozBot(command_prefix=prefix)
 
     @bot.event
     async def on_ready():
