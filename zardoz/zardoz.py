@@ -205,6 +205,7 @@ def dize(args):
     from .zhistory import HistoryCommands
     from .zmode import ModeCommands
     from .zroll import RollCommands
+    from .zsample import SampleCommands
     from .zvars import VarCommands
 
     log = setup_logger(args.log)
@@ -251,6 +252,7 @@ def dize(args):
     bot.add_cog(VarCommands(bot, DB))
     bot.add_cog(ModeCommands(bot, DB))
     bot.add_cog(HistoryCommands(bot, DB))
+    bot.add_cog(SampleCommands(bot, DB))
 
     bot.run(TOKEN)
 
