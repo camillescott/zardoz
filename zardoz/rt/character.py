@@ -7,26 +7,26 @@
 # Date   : 25.02.2021
 
 from dataclasses import dataclass
-from enum import IntEnum, auto
+from enum import Enum
 
 from ..utils import require_kwargs
 
 
-class Characteristic(IntEnum):
-    WeaponSkill = auto()
-    BallisticSkill = auto()
-    Strength = auto()
-    Toughness = auto()
-    Agility = auto()
-    Intelligence = auto()
-    Perception = auto()
-    Willpower = auto()
-    Fellowship = auto()
+class Characteristic(Enum):
+    WeaponSkill = 'WS'
+    BallisticSkill = 'BS'
+    Strength = 'S'
+    Toughness = 'T'
+    Agility = 'AG'
+    Intelligence = 'INT'
+    Perception = 'PER'
+    Willpower = 'WP'
+    Fellowship = 'FEL'
 
 
 class CharacteristicInstance:
 
-    def __init__(self, *, characteristic: Characteristic, base: int):
+    def __init__(self, characteristic: Characteristic, base: int):
         self.characteristic = characteristic
         self.base = base
         self.modifiers = []
@@ -39,7 +39,7 @@ class CharacteristicInstance:
 
     @property
     def bonus(self):
-        return (self.base // 10) * self.multiplier
+        return (int(self) // 10) * self.multiplier
 
     def advance(self):
         if self.advances < 4:
@@ -54,9 +54,9 @@ class CharacteristicInstance:
         self.modifier_tags = []
 
     def __str__(self):
-        return f'({self.characteristic.name}={int(self)}, '\
+        return f'{self.characteristic.value}={int(self)}: '\
                f'bonus={self.bonus}, advances={self.advances}, '\
-               f'modifiers={dict(zip(self.modifier_tags, self.modifiers))})'
+               f'modifiers={dict(zip(self.modifier_tags, self.modifiers))}'
 
 
 class Player:
@@ -78,17 +78,25 @@ class Player:
             raise ValueError('Player must have a name!')
 
         self.name = name
-
-        self.WS = CharacteristicInstance(Characteristic.WeaponSkill, base_ws)
-        self.BS = CharacteristicInstance(Characteristic.BallisticSkill, base_bs)
-        self.S = CharacteristicInstance(Characteristic.Strength, base_s)
-        self.T = CharacteristicInstance(Characteristic.Toughness, base_t)
-        self.AG = CharacteristicInstance(Characteristic.Agility, base_ag)
-        self.INT = CharacteristicInstance(Characteristic.Intelligence, base_int)
-        self.PER = CharacteristicInstance(Characteristic.Perception, base_per)
-        self.WP = CharacteristicInstance(Characteristic.Willpower, base_wp)
-        self.FEL = CharacteristicInstance(Characteristic.Fellowship, base_fel)
+        self.chars = {
+            Characteristic.WeaponSkill.value: CharacteristicInstance(Characteristic.WeaponSkill, base_ws),
+            Characteristic.BallisticSkill.value: CharacteristicInstance(Characteristic.BallisticSkill, base_bs),
+            Characteristic.Strength.value: CharacteristicInstance(Characteristic.Strength, base_s),
+            Characteristic.Toughness.value: CharacteristicInstance(Characteristic.Toughness, base_t),
+            Characteristic.Agility.value: CharacteristicInstance(Characteristic.Agility, base_ag),
+            Characteristic.Intelligence.value: CharacteristicInstance(Characteristic.Intelligence, base_int),
+            Characteristic.Perception.value: CharacteristicInstance(Characteristic.Perception, base_per),
+            Characteristic.Willpower.value: CharacteristicInstance(Characteristic.Willpower, base_wp),
+            Characteristic.Fellowship.value: CharacteristicInstance(Characteristic.Fellowship, base_fel)
+        }
+        for name, characteristic in self.chars.items():
+            setattr(self, name, characteristic)
         
         self.base_fate = base_fate if base_fate > 0 else 0
 
-
+    def __str__(self):
+        chars = '\n    '.join((str(char) for char in self.chars.values()))
+        return f'Player: {self.name}\n'\
+                '  Characteristics:\n'\
+               f'    {chars}\n'\
+               f'  Fate: {self.base_fate}'
