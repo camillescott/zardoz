@@ -28,5 +28,5 @@ MODE_META = {GameMode.DEFAULT: 'Default die is 1d6',
 MODE_DICE = {GameMode.DEFAULT: '1d6',
              GameMode.RT: '1d100',
              GameMode.DND: '1d20',
-             GameMode.AW: '1d6'}
+             GameMode.AW: '2d6t'}
 
