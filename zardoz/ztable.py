@@ -13,8 +13,11 @@ import typing
 
 import dice
 import yaml
+import pyaml
 
+from discord import Embed
 from discord.ext import commands
+from disputils import BotEmbedPaginator
 
 from .logging import LoggingMixin
 from .rolls import SimpleRollConvert
@@ -50,6 +53,25 @@ class RollTable:
 
         return rolled_val, name, effect
 
+    def __str__(self):
+        entries = []
+        for item in table.rolls:
+            entries.append(f'*{item["name"]}* ({item["range"][0]}-{item["range"][1]}):\n    {item["effect"]}')
+        header = f'**{table.full_name}**: {table.book}'
+        return header + '\n' + '\n'.join(entries)
+
+    def paginate(self):
+        # result = f'**{table.full_name}**: {table.book}'
+        result = ''
+        for item in self.rolls:
+            entry = f'*{item["name"]}* ({item["range"][0]}-{item["range"][1]}):\n    {item["effect"]}'
+            if len(entry) + len(result) <= 1800:
+                result += entry
+            else:
+                yield result
+                result = entry
+        yield result
+
 
 def load_crit_tables(log=None):
     
@@ -84,8 +106,10 @@ class TableCommands(commands.Cog, LoggingMixin):
         self.log.info(f'Loaded tables: {TABLES}')
 
     @commands.command(name='ztable', help='Roll on a table.')
-    async def ztable(self, ctx, table: TableConvert = None,
-                               val: typing.Union[int, SimpleRollConvert] = None):
+    async def ztable(self, ctx,
+                           table: TableConvert = None,
+                           val: typing.Union[int, SimpleRollConvert] = None,
+                           *, cmd=''):
         if ctx.invoked_subcommand is not None:
             return
 
@@ -100,6 +124,11 @@ class TableCommands(commands.Cog, LoggingMixin):
             self.log.info(f'/ztable: {table.slug}, {val}')
             return
 
+        if cmd == 'show':
+            chunks = [Embed(title=table.full_name, description=d) for d in table.paginate()]
+            paginator = BotEmbedPaginator(ctx, chunks)
+            await paginator.run()
+            return
         try:
             if val is None:
                 val, name, effect = table.roll()
