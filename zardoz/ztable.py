@@ -13,7 +13,6 @@ import typing
 
 import dice
 import yaml
-import pyaml
 
 from discord import Embed
 from discord.ext import commands
@@ -64,7 +63,8 @@ class RollTable:
         # result = f'**{table.full_name}**: {table.book}'
         result = ''
         for item in self.rolls:
-            entry = f'*{item["name"]}* ({item["range"][0]}-{item["range"][1]}):\n    {item["effect"]}'
+            name = f"*{item['name']}* " if item['name'] else ''
+            entry = f'{name}({item["range"][0]}-{item["range"][1]}):\n    {item["effect"]}'
             if len(entry) + len(result) <= 1800:
                 result += entry
             else:
@@ -105,13 +105,16 @@ class TableCommands(commands.Cog, LoggingMixin):
 
         self.log.info(f'Loaded tables: {TABLES}')
 
-    @commands.command(name='ztable', help='Roll on a table.')
-    async def ztable(self, ctx,
+    @commands.group(name='ztable', help='Roll on a table.')
+    async def ztable(self, ctx):
+        if ctx.invoked_subcommand is not None:
+            return
+
+    @ztable.command(name='get', help='Get or roll a table entry.')
+    async def ztable_get(self, ctx,
                            table: TableConvert = None,
                            val: typing.Union[int, SimpleRollConvert] = None,
                            *, cmd=''):
-        if ctx.invoked_subcommand is not None:
-            return
 
         if table is None:
             header = '**Available Tables:**'
@@ -124,11 +127,6 @@ class TableCommands(commands.Cog, LoggingMixin):
             self.log.info(f'/ztable: {table.slug}, {val}')
             return
 
-        if cmd == 'show':
-            chunks = [Embed(title=table.full_name, description=d) for d in table.paginate()]
-            paginator = BotEmbedPaginator(ctx, chunks)
-            await paginator.run()
-            return
         try:
             if val is None:
                 val, name, effect = table.roll()
@@ -147,3 +145,9 @@ class TableCommands(commands.Cog, LoggingMixin):
 
             await ctx.message.reply('\n'.join(msg))
 
+    @ztable.command(name='show', help='Show the given table.')
+    async def ztable_show(self, ctx, table: TableConvert):
+        chunks = [Embed(title=f'{table.full_name} ({table.game}, {table.book})',
+                        description=d) for d in table.paginate()]
+        paginator = BotEmbedPaginator(ctx, chunks)
+        await paginator.run()
