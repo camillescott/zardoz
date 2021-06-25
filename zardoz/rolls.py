@@ -232,7 +232,7 @@ class RollList:
         if isinstance(roll, int):
             self.roll = [roll]
         else:
-            self.roll = sorted(list(roll))
+            self.roll = list(roll)
 
     def describe(self, **kwargs):
         dsc = ', '.join((str(r) for r in self.roll))
