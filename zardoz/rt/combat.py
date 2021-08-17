@@ -8,9 +8,11 @@
 
 from abc import ABC, abstractmethod
 import collections
+from enum import Enum
 import os
 
 from .character import Characteristic
+from .weapons import WeaponClass
 from ..utils import __pkg_dir__, reverse_number, d10, d100, Nd10
 from ..ztable import RollTable
 
@@ -48,11 +50,12 @@ COMBAT_ACTIONS = {}
 
 class CombatAction:
 
-    def __init__(self, name: str, before_effects = None, after_effects = None, special=''):
+    def __init__(self, name: str, before_effects = None, after_effects = None, special='', type=1):
         self.name = name
         self.before_effects = before_effects if before_effects else []
         self.after_effects = after_effects if after_effects else []
         self.special = special
+        self.type = type
 
         COMBAT_ACTIONS[name] = self
 
@@ -69,31 +72,36 @@ AimFull = CombatAction('Aim Full',
                        before_effects = [
                            CharacteristicBonus(Characteristic.WeaponSkill, 20),
                            CharacteristicBonus(Characteristic.BallisticSkill, 20)
-                       ])
+                       ],
+                       type=1)
 
 AimHalf = CombatAction('Aim Half',
                        before_effects = [
                            CharacteristicBonus(Characteristic.WeaponSkill, 10),
                            CharacteristicBonus(Characteristic.BallisticSkill, 10)
-                       ])
+                       ],
+                       type=.5)
 
 AllOutAttack = CombatAction('All Out Attack',
                             before_effects = [
                                 CharacteristicBonus(Characteristic.WeaponSkill, 20)
                             ],
+                            type=1,
                             special='Cannot dodge or parry')
 
 CalledShot = CombatAction('Called Shot',
                           before_effects = [
-                              CharacteristicBonus(Characteristic.WeaponSkill, 20),
-                              CharacteristicBonus(Characteristic.BallisticSkill, 20)
+                              CharacteristicBonus(Characteristic.WeaponSkill, -20),
+                              CharacteristicBonus(Characteristic.BallisticSkill, -20)
                           ],
+                          type=1,
                           special='Attack a specific location')
 
 Charge = CombatAction('Charge',
                       before_effects = [
                           CharacteristicBonus(Characteristic.WeaponSkill, 10)
                       ],
+                      type=1,
                       special='Must move 4 metres')
 
 FullAutoBurst = CombatAction('Full Auto Burst',
@@ -102,7 +110,8 @@ FullAutoBurst = CombatAction('Full Auto Burst',
                              ],
                              after_effects = [
                                  ExtraHitsBonus()
-                             ])
+                             ],
+                             type=1)
 
 SemiAutoBurst = CombatAction('Semi Auto Burst',
                              before_effects = [
@@ -110,8 +119,12 @@ SemiAutoBurst = CombatAction('Semi Auto Burst',
                              ],
                              after_effects = [
                                  ExtraHitsBonus(dos_div=2)
-                             ])
+                             ],
+                             type=1)
 
+
+StandardAttack = CombatAction('Standard Attack',
+                              type=.5)
 
 class HitLocTable:
 
@@ -210,6 +223,8 @@ class AttackContext:
             hits_max = self.weapon.rof_semi
         elif FullAutoBurst in self.actions:
             hits_max = self.weapon.rof_auto
+        elif weapon.weapon_class == WeaponClass.Melee:
+            hits_max = 1
         else:
             hits_max = int(self.weapon.rof_single)
         return min(self.hits_base + self.hits_extra, hits_max)
@@ -220,127 +235,145 @@ class AttackContext:
 
     @property
     def total_damage(self):
-        return sum((int(roll) for roll in self.damage_rolls))
+        return sum((int(roll) for roll in self.damage_rolls)) + self.damage_bonus
 
 
-def player_attack(weapon_instance, char_val, actions=None, target_range: int = 10, quiet: bool = True):
+def player_attack_test(ctx, quiet: bool = True):
 
-        def _print(*args, **kwargs):
-            if not quiet:
-                print(*args, **kwargs)
+    def _print(*args, **kwargs):
+        if not quiet:
+            print(*args, **kwargs)
 
-        #
-        # Sanitize parameters
-        #
-
-        if actions is None:
-            actions = []
-        elif not isinstance(actions, collections.Sequence):
-            actions = set([actions])
-        else:
-            actions = set(actions)
-
-        assert len(actions) < 3
-
-        if SemiAutoBurst in actions and not weapon_instance.rof_semi:
-            raise ValueError(f'{weapon_instance.name} does not support semi-auto')
-        if FullAutoBurst in actions and not weapon_instance.rof_auto:
-            raise ValueError(f'{weapon_instance.name} does not support full-auto')
-        if target_range / weapon_instance.range > 4:
-            raise ValueError(f'{weapon_instance.name} cannot fire more than {weapon_instance.range * 4}m')
-
-        # setup the attack context
-        ctx = AttackContext(weapon_instance, char_val, target_range, actions=actions, quiet=quiet)
-
-        # apply characteristic bonuses
-        for action in actions:
-            for bonus in action.before_effects:
-                bonus(ctx)
-                _print(bonus)
-        # now we'd apply specials from the weapon itself in the same way
-
+    if ctx.weapon.weapon_class not in [WeaponClass.Melee, WeaponClass.Thrown]:
         # figure ranges
-        if target_range <= 2:
+        if ctx.target_range <= 2:
             # point blank
             _print('Point blank: +30')
             ctx.add_test_bonus(30)
-        elif target_range <= (weapon_instance.range / 2):
+        elif ctx.target_range <= (ctx.weapon.range / 2):
             # short range
             ctx.add_test_bonus(10)
             _print('Close: +10')
-        elif target_range >= (weapon_instance.range * 3):
+        elif ctx.target_range >= (ctx.weapon.range * 3):
             # extreme range
             ctx.add_test_bonus(-30)
             _print('Extreme: -30')
-        elif target_range >= (weapon_instance.range * 2):
+        elif ctx.target_range >= (ctx.weapon.range * 2):
             # long range
             ctx.add_test_bonus(-10)
             _print('Long: -10')
         else:
             _print('Normal range.')
 
-        _print(f'final test: {ctx.test_base} + {ctx.test_bonus}')
+    _print(f'final test: {ctx.test_base} + {ctx.test_bonus}')
 
-        # roll it
-        ctx.attack_roll = d100()
-        delta = abs(ctx.test - ctx.attack_roll)
-        ctx.attack_degrees = delta // 10
+    # roll it
+    ctx.attack_roll = d100()
+    delta = abs(ctx.test - ctx.attack_roll)
+    ctx.attack_degrees = delta // 10
 
-        _print(f'rolled {ctx.attack_roll} for {ctx.attack_degrees} degrees')
+    _print(f'rolled {ctx.attack_roll} for {ctx.attack_degrees} degrees')
 
-        # TODO: check jamming and exploding
+    # TODO: check jamming and exploding
 
-        if not ctx.success:
-            # damage, effective_char, degrees, hits, locations, message
-            return 0, ctx.test, ctx.attack_degrees, 0, [], "Failed to hit"
-        else:
-            ctx.hits_base = 1
 
-        # apply action bonuses
-        for action in actions:
-            for bonus in action.after_effects:
-                bonus(ctx)
-                _print(bonus)
+def player_attack(weapon_instance, char_val, char_bonus = None,
+                  actions=None, misc_bonus=0, target_range: int = 10,
+                  quiet: bool = True):
 
-        _print(f'hits after bonus: {ctx.hits}')
+    def _print(*args, **kwargs):
+        if not quiet:
+            print(*args, **kwargs)
 
-        # get hit location with reverse_number
-        # for multiple hits 
+    #
+    # Sanitize parameters
+    #
 
-        # roll for damage
-        for hit_counter in range(ctx.hits):
-            _print(f'roll hit {hit_counter + 1}')
+    if actions is None:
+        actions = []
+    elif not isinstance(actions, collections.Sequence):
+        actions = set([actions])
+    else:
+        actions = set(actions)
 
-            roll = DamageRoll(Nd10(n=weapon_instance.damage_roll), weapon_instance.damage_bonus)
+    assert len(actions) < 3
 
-            _print(f'initial damage roll: {roll.dice}')
+    if SemiAutoBurst in actions and not weapon_instance.rof_semi:
+        raise ValueError(f'{weapon_instance.name} does not support semi-auto')
+    if FullAutoBurst in actions and not weapon_instance.rof_auto:
+        raise ValueError(f'{weapon_instance.name} does not support full-auto')
+    if target_range / weapon_instance.range > 4:
+        raise ValueError(f'{weapon_instance.name} cannot fire more than {weapon_instance.range * 4}m')
 
-            # replace lowest with DoS if its lower
-            roll.replace_lowest(ctx.attack_degrees)
+    if char_bonus is None:
+        char_bonus = char_val // 10
 
-            _print(f'damage roll after replace: {roll.dice}')
+    # setup the attack context
+    ctx = AttackContext(weapon_instance, char_val, target_range, actions=actions, quiet=quiet)
 
-            # TODO: apply weapon special roll bonuses
+    # apply characteristic bonuses
+    for action in ctx.actions:
+        for bonus in action.before_effects:
+            bonus(ctx)
+            _print(bonus)
+    # now we'd apply specials from the weapon itself in the same way
 
-            ctx.add_damage_roll(roll)
-            _print(f'damage before fury: {int(roll)}')
+    # test for hit
+    player_attack_test(ctx, quiet=quiet)
 
-            fury = 10 in roll.dice
-            while (fury):
-                fury_roll = d100() <= ctx.test
+    if not ctx.success:
+        # damage, effective_char, degrees, hits, locations, message
+        return 0, ctx.test, ctx.attack_degrees, 0, [], "Failed to hit"
+    else:
+        ctx.hits_base = 1
 
-                if fury_roll:
-                    fury_damage = d10()
+    # apply action after-test bonuses
+    for action in ctx.actions:
+        for bonus in action.after_effects:
+            bonus(ctx)
+            _print(bonus)
 
-                    _print(f'fury! rolled {fury_damage}')
+    _print(f'hits after bonus: {ctx.hits}')
 
-                    roll.add_fury(fury_damage)
-                    fury = fury_damage == 10
-                else:
-                    fury = False
+    # get hit location with reverse_number
+    # for multiple hits 
 
-        _print(f'final damage: {ctx.total_damage}')
-                
+    # roll for damage
+    for hit_counter in range(ctx.hits):
+        _print(f'roll hit {hit_counter + 1}')
 
-        locs = HIT_LOC_TABLE.get_location(ctx.attack_roll, ctx.hits)
-        return ctx.total_damage, ctx.test, ctx.attack_degrees, ctx.hits, locs, "Hit!"
+        roll = DamageRoll(Nd10(n=weapon_instance.damage_roll), weapon_instance.damage_bonus)
+
+        _print(f'initial damage roll: {roll.dice}')
+
+        # replace lowest with DoS if its lower
+        roll.replace_lowest(ctx.attack_degrees)
+
+        _print(f'damage roll after replace: {roll.dice}')
+
+        # TODO: apply weapon special roll bonuses
+
+        ctx.add_damage_roll(roll)
+        _print(f'damage before fury: {int(roll)}')
+
+        fury = 10 in roll.dice
+        while (fury):
+            fury_roll = d100() <= ctx.test
+
+            if fury_roll:
+                fury_damage = d10()
+
+                _print(f'fury! rolled {fury_damage}')
+
+                roll.add_fury(fury_damage)
+                fury = fury_damage == 10
+            else:
+                fury = False
+
+    if weapon_instance.weapon_class in [WeaponClass.Melee, WeaponClass.Thrown]:
+        ctx.damage_bonus += char_bonus
+
+    _print(f'final damage: {ctx.total_damage}')
+
+    locs = HIT_LOC_TABLE.get_location(ctx.attack_roll, ctx.hits)
+    return ctx.total_damage, ctx.test, ctx.attack_degrees, ctx.hits, locs, "Hit!"

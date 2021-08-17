@@ -115,6 +115,10 @@ class PlayerWeaponInstance(InstanceMixin):
         return f'<{self.name} {self.damage_roll}d10+{self.damage_bonus}{self.pretty_damage_type} {self.pretty_rof} {self.range}m>'
 
     @property
+    def weapon_class(self):
+        return self.weapon_model.weapon_class
+
+    @property
     def range(self):
         return self.weapon_model.weapon_range
 
