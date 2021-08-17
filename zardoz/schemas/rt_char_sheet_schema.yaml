@@ -1,0 +1,39 @@
+meta:
+  player_name: str()
+  player_id: str()
+  sheet_version: 1.0
+sheet:
+  character_name: str()
+  career_path: str(required=False)
+  rank: int(min=1)
+  home_world: str(required=False)
+  motivation: str(required=False)
+  experience:
+    spent: int()
+    to_spend: int(min=0)
+  corruption: int(min=0, max=100)
+  insanity: int(min=0, max=100)
+  characteristics:
+    WS: include('characteristic')
+    BS: include('characteristic')
+    S: include('characteristic')
+    T: include('characteristic')
+    AG: include('characteristic')
+    INT: include('characteristic')
+    PER: include('characteristic')
+    WP: include('characteristic')
+    FEL: include('characteristic')
+  skills: list(include('skill'))
+
+---
+characteristic:
+  base: int(min=0)
+  advances: int(min=0, max=4)
+  modifier: int(min=-60, max=60)
+  bonus_mult: int(min=1, max=3)
+  notes: str(required=False)
+skill:
+  name: skill()
+  group: str(required=False)
+  level: enum('Basic', 'Trained', '+10', '+20')
+  bonus: int(required=False)
