@@ -8,6 +8,9 @@
 
 from dataclasses import dataclass
 from enum import Enum
+import sys
+
+import yamale
 
 from ..utils import require_kwargs
 
@@ -32,14 +35,14 @@ class CharacteristicInstance:
         self.modifiers = []
         self.modifier_tags = []
         self.advances = 0
-        self.multiplier = 1
+        self.bonus_multiplier = 1
 
     def __int__(self):
         return self.base + (self.advances * 5) + sum(self.modifiers)
 
     @property
     def bonus(self):
-        return (int(self) // 10) * self.multiplier
+        return (int(self) // 10) * self.bonus_multiplier
 
     def advance(self):
         if self.advances < 4:
@@ -100,3 +103,22 @@ class Player:
                 '  Characteristics:\n'\
                f'    {chars}\n'\
                f'  Fate: {self.base_fate}'
+
+
+class CharacterSheet:
+
+    @classmethod
+    def from_yaml(cls, yaml_path):
+        schema = yamale.make_schema(os.path.join(ZARDOZ_PKG_DIR, 'schemas', 'rt_char_sheet_schema.yaml'))
+        data = yamale.make_data(yaml_path)
+
+        try:
+            yamale.validate(schema, data)
+            print('Character sheet successfully validated! 👍', file=sys.stderr)
+        except YamaleError as e:
+            print('Character sheet failed validation!\n', file=sys.stderr)
+            for result in e.value.results:
+                print(f"Error validating data {result.data} with {result.schema}\n\t", file=sys.stderr)
+                for error in result.errors:
+                    print(f'\t{error}', file=sys.stderr)
+            return None

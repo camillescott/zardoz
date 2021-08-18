@@ -20,7 +20,7 @@ import discord
 from xdg import xdg_data_home
 
 
-__pkg_dir__ = os.path.abspath(os.path.dirname(__file__))
+ZARDOZ_PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 __time_format__ = '%a %b %d %I:%M%p %Z'
 
 _T = TypeVar("_T")

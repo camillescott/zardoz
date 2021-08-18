@@ -8,7 +8,8 @@
 
 import collections
 from dataclasses import dataclass, field
-from enum import IntEnum, auto
+from enum import Enum
+from typing import Tuple
 
 import dice
 
@@ -16,63 +17,66 @@ from ..utils import require_kwargs, reverse_number, d10, d100, Nd10
 from .character import Characteristic
 from .items import Craftsmanship, InstanceMixin, Item
 
-
-class WeaponClass(IntEnum):
-    Pistol = auto()
-    Basic = auto()
-    Heavy = auto()
-    Thrown = auto()
-    Melee = auto()
+from mashumaro import DataClassYAMLMixin
+from mashumaro.config import BaseConfig
 
 
-class DamageType(IntEnum):
-    Energy = auto()
-    Impact = auto()
-    Rending = auto()
-    Explosive = auto()
+class WeaponClass(Enum):
+    Pistol = 'Pistol'
+    Basic = 'Basic'
+    Heavy = 'Heavy'
+    Thrown = 'Thrown'
+    Melee = 'Melee'
 
 
-class WeaponType(IntEnum):
-    Las = auto()
-    SP = auto()
-    Bolt = auto()
-    Melta = auto()
-    Plasma = auto()
-    Flame = auto()
-    Primitive = auto()
-    Launcher = auto()
-    Grenade = auto()
-    Missile = auto()
-    Exotic = auto()
-    Xenos = auto()
-    Chain = auto()
-    Shock = auto()
-    Power = auto()
-    Force = auto()
-    Ork = auto()
+class DamageType(Enum):
+    Energy = 'Energy'
+    Impact = 'Impact'
+    Rending = 'Rending'
+    Explosive = 'Explosive'
 
 
-class ShotType(IntEnum):
-    Single = auto()
-    Semi = auto()
-    Full = auto()
+class WeaponType(Enum):
+    Las = 'Las'
+    SP = 'SP'
+    Bolt = 'Bolt'
+    Melta = 'Melta'
+    Plasma = 'Plasma'
+    Flame = 'Flame'
+    Primitive = 'Primitive'
+    Launcher = 'Launcher'
+    Grenade = 'Grenade'
+    Missile = 'Missile'
+    Exotic = 'Exotic'
+    Xenos = 'Xenos'
+    Chain = 'Chain'
+    Shock = 'Shock'
+    Power = 'Power'
+    Force = 'Force'
+    Ork = 'Ork'
+
+
+class ShotType(Enum):
+    Single = 'Single'
+    Semi = 'Semi'
+    Full = 'Full'
 
 
 @require_kwargs
 @dataclass(frozen=True)
-class PlayerWeapon(Item):
+class PlayerWeapon(Item, DataClassYAMLMixin):
 
     weapon_class: WeaponClass
     weapon_type: WeaponType
     weapon_range: int
-    rof: tuple
+    rof: Tuple[bool, int, int]
     damage_roll: int
     damage_bonus: int
     damage_type: DamageType
     pen: int
     clip: int
     reload_time: float
-    special: tuple = field(default_factory=tuple)
+    #special: Tuple = field(default_factory=tuple)
     reference: str = ''
     extra: str = ''
 

@@ -16,3 +16,5 @@ __about__ = 'A discord dice-rolling bot with lots of nifty features.'
 __testing__ = bool(os.environ.get('ZARDOZ_DEBUG', False))
 
 from .zardoz import main
+
+from . import rt

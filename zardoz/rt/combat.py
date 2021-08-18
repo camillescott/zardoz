@@ -13,7 +13,7 @@ import os
 
 from .character import Characteristic
 from .weapons import WeaponClass
-from ..utils import __pkg_dir__, reverse_number, d10, d100, Nd10
+from ..utils import ZARDOZ_PKG_DIR, reverse_number, d10, d100, Nd10
 from ..ztable import RollTable
 
 
@@ -130,7 +130,7 @@ class HitLocTable:
 
     def __init__(self):
 
-        self.base = RollTable(os.path.join(__pkg_dir__, 'tables', 'rt_hit_loc.yaml'))
+        self.base = RollTable(os.path.join(ZARDOZ_PKG_DIR, 'tables', 'rt_hit_loc.yaml'))
         self.table = {'Head': ['Head', 'Arm', 'Body', 'Arm', 'Body'],
                       'Arm':  ['Arm', 'Body', 'Head', 'Body', 'Arm'],
                       'Body': ['Body', 'Arm', 'Head', 'Arm', 'Body'],

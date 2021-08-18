@@ -10,12 +10,12 @@ from contextlib import contextmanager
 import os
 
 
-from .combat import player_attack, COMBAT_ACTIONS
-from .items import ItemAvailability
-from .weapons import (WeaponClass, WeaponType, DamageType, Craftsmanship,
-                      PlayerWeapon, PlayerWeaponInstance)
-
 def zimulate(args):
+
+    from .combat import player_attack, COMBAT_ACTIONS
+    from .items import ItemAvailability
+    from .weapons import (WeaponClass, WeaponType, DamageType, Craftsmanship,
+                      PlayerWeapon, PlayerWeaponInstance)
 
     weapon_model = PlayerWeapon(
         name=args.name,

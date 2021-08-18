@@ -18,12 +18,12 @@ import sqlite3
 
 from .logging import LoggingMixin
 from .state import GameMode
-from .utils import __pkg_dir__
+from .utils import ZARDOZ_PKG_DIR
 
 
 def load_sql_commands(*args, **kwargs):
     mode = kwargs.get('mode', 'aiosqlite')
-    cmd_file = os.path.join(__pkg_dir__, 'sql', 'commands.sql')
+    cmd_file = os.path.join(ZARDOZ_PKG_DIR, 'sql', 'commands.sql')
     cmds = aiosql.from_path(cmd_file, mode)
     return cmds
 
@@ -87,7 +87,7 @@ class ZardozDatabase(LoggingMixin):
 
     @classmethod
     async def build(cls, db_dir, guild_id):
-        spec_file = os.path.join(__pkg_dir__, 'sql', 'database.sql')
+        spec_file = os.path.join(ZARDOZ_PKG_DIR, 'sql', 'database.sql')
         async with aiofiles.open(spec_file, mode='r') as fp:
             spec_script = await fp.read()
 

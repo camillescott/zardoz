@@ -20,7 +20,7 @@ from disputils import BotEmbedPaginator
 
 from .logging import LoggingMixin
 from .rolls import SimpleRollConvert
-from .utils import __pkg_dir__
+from .utils import ZARDOZ_PKG_DIR
 
 
 class RollTable:
@@ -75,7 +75,7 @@ class RollTable:
 
 def load_crit_tables(log=None):
     
-    files = glob.glob(os.path.join(__pkg_dir__, 'tables', '*.yaml'))
+    files = glob.glob(os.path.join(ZARDOZ_PKG_DIR, 'tables', '*.yaml'))
     tables = {}
     for file_path in files:
         table = RollTable(file_path)
