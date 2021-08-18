@@ -36,7 +36,10 @@ class HistoryCommands(commands.Cog, LoggingMixin):
             if name is None:
                 name = row.get('member_name', row.get('member_nick', 'Unknown'))
             timestamp = row['time'].strftime(__time_format__)
-            return f'{name} @ `{timestamp}`: `{row["roll"]:20}` ⟿  `{row["result"]}`'
+            result = f'{name} @ `{timestamp}`: `{row["roll"]:20}` ⟿  `{row["result"]}`'
+            if row['tag']:
+                result += f'# {row["tag"]}'
+            return result
 
         msg = '\n'.join((format(record) for record in records))
         await ctx.send(f'**Roll :game_die: History**:\n{msg}')

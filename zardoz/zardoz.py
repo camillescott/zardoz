@@ -31,9 +31,7 @@ import textwrap
 from discord.ext import commands
 
 from . import __version__, __splash__, __about__, __testing__
-from .rt.simulate import zimulate
 from .utils import default_log_file, default_database_dir, EnumAction
-
 
 
 class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
@@ -42,11 +40,6 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 
 
 def main():
-
-    from .rt.combat import COMBAT_ACTIONS
-    from .rt.items import ItemAvailability
-    from .rt.weapons import (WeaponClass, WeaponType, DamageType,
-                             Craftsmanship)
 
     parser = argparse.ArgumentParser(
         description=f'{__splash__}\n{__about__}',
@@ -77,120 +70,6 @@ def main():
              'XDG specifiction.'
     )
     bot.set_defaults(func=dize)
-
-    simulate = subparsers.add_parser('zimulate')
-    simulate.add_argument(
-        '-BS',
-        '--ballistic-skill',
-        default=40,
-        type=int
-    )
-    simulate.add_argument(
-        '--actions',
-        nargs='+',
-        choices=COMBAT_ACTIONS.keys()
-    )
-    simulate.add_argument(
-        '--target-range',
-        default=10,
-        type=int
-    )
-    simulate.add_argument(
-        '--name',
-        default='RT Weapon',
-    )
-    simulate.add_argument(
-        '--availability',
-        default=ItemAvailability.Scarce,
-        action=EnumAction,
-        type=ItemAvailability
-    )
-    simulate.add_argument(
-        '--weapon-class',
-        default=WeaponClass.Pistol,
-        action=EnumAction,
-        type=WeaponClass
-    )
-    simulate.add_argument(
-        '--type',
-        default=WeaponType.Las,
-        type=WeaponType,
-        action=EnumAction
-    )
-    simulate.add_argument(
-        '--range',
-        default=20,
-        type=int
-    )
-    simulate.add_argument(
-        '--rof-single',
-        default=True,
-        type=bool
-    )
-    simulate.add_argument(
-        '--rof-semi',
-        default=0,
-        type=int
-    )
-    simulate.add_argument(
-        '--rof-auto',
-        default=0,
-        type=int
-    )
-    simulate.add_argument(
-        '--damage-d10',
-        default=1,
-        type=int
-    )
-    simulate.add_argument(
-        '--damage-bonus',
-        default=3,
-        type=int
-    )
-    simulate.add_argument(
-        '--damage-type',
-        default=DamageType.Energy,
-        type=DamageType,
-        action=EnumAction
-    )
-    simulate.add_argument(
-        '--pen',
-        default=0,
-        type=int
-    )
-    simulate.add_argument(
-        '--clip',
-        default=10,
-        type=int
-    )
-    simulate.add_argument(
-        '--reload-time',
-        default=1.0,
-        type=float
-    )
-    simulate.add_argument(
-        '--mass',
-        default=2.0,
-        type=float
-    )
-    simulate.add_argument(
-        '--craftsmanship',
-        default=Craftsmanship.Common,
-        type=Craftsmanship,
-        action=EnumAction
-    )
-    simulate.add_argument(
-        '--n-trials',
-        '-N',
-        default=10000,
-        type=int
-    )
-    simulate.add_argument(
-        '--plot',
-        default='text',
-        choices = ['text', 'image']
-    )
-    simulate.set_defaults(func=zimulate)
 
     args = parser.parse_args()
     args.func(args)
