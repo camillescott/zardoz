@@ -54,7 +54,7 @@ class ModeCommands(commands.Cog, LoggingMixin):
             else:
                 await ctx.message.reply(f'**Set Mode:** {GameMode(mode).name}')
     
-    @zmode.command(name='list')
+    @mode.command(name='list')
     async def list(self, ctx):
         '''
         List the available game modes for this server.

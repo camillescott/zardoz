@@ -110,7 +110,7 @@ class TableCommands(commands.Cog, LoggingMixin):
         if ctx.invoked_subcommand is not None:
             return
 
-    @ztable.command(name='get', help='Get or roll a table entry.')
+    @table.command(name='get', help='Get or roll a table entry.')
     async def table_get(self, ctx,
                            table: TableConvert = None,
                            val: typing.Union[int, SimpleRollConvert] = None,
@@ -145,7 +145,7 @@ class TableCommands(commands.Cog, LoggingMixin):
 
             await ctx.message.reply('\n'.join(msg))
 
-    @ztable.command(name='show', help='Show the given table.')
+    @table.command(name='show', help='Show the given table.')
     async def table_show(self, ctx, table: TableConvert):
         chunks = [Embed(title=f'{table.full_name} ({table.game}, {table.book})',
                         description=d) for d in table.paginate()]

@@ -28,7 +28,7 @@ class VarCommands(commands.Cog, LoggingMixin):
         if ctx.invoked_subcommand is None:
             pass
 
-    @zvar.command(name='list')
+    @var.command(name='list')
     @fetch_guild_db
     async def var_list(self, ctx):
         '''
@@ -41,7 +41,7 @@ class VarCommands(commands.Cog, LoggingMixin):
         else:
             await ctx.send('**No variables set.**')
     
-    @zvar.command(name='set')
+    @var.command(name='set')
     @fetch_guild_db
     async def var_set(self, ctx, var: str, val: int):
         '''
@@ -50,7 +50,7 @@ class VarCommands(commands.Cog, LoggingMixin):
         await ctx.guild_db.set_guild_var(ctx.author.id, var, val)
         await ctx.send(f'**{var}** = {val}')
 
-    @zvar.command(name='get')
+    @var.command(name='get')
     @fetch_guild_db
     async def var_get(self, ctx, var: str):
         '''
@@ -62,7 +62,7 @@ class VarCommands(commands.Cog, LoggingMixin):
         else:
             await ctx.send(f'**{var}** = {val}')
 
-    @zvar.command(name='del')
+    @var.command(name='del')
     @fetch_guild_db
     async def var_del(self, ctx, var: str):
         '''
