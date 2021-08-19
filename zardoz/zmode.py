@@ -33,9 +33,12 @@ class ModeCommands(commands.Cog, LoggingMixin):
 
         super().__init__()
 
-    @commands.group(name='zmode', help='Manage game modes for the server')
+    @commands.group(name='mode')
     @fetch_guild_db
-    async def zmode(self, ctx, mode: typing.Optional[ModeConvert]):
+    async def mode(self, ctx, mode: typing.Optional[ModeConvert]):
+        '''
+        Get and set the game mode for this server.
+        '''
         if ctx.invoked_subcommand is not None:
             return
 
@@ -51,8 +54,11 @@ class ModeCommands(commands.Cog, LoggingMixin):
             else:
                 await ctx.message.reply(f'**Set Mode:** {GameMode(mode).name}')
     
-    @zmode.command(name='list', help='List available modes.')
-    async def zmode_list(self, ctx):
+    @zmode.command(name='list')
+    async def list(self, ctx):
+        '''
+        List the available game modes for this server.
+        '''
         modes = '\n'.join((f'{mode.name}: {MODE_META[mode]}' for mode in GameMode))
         await ctx.message.reply(modes)
 

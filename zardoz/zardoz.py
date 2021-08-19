@@ -111,7 +111,7 @@ def dize(args):
             await super().close()
             log.info('Bot closed.')
 
-    prefix = '/' if not __testing__ else '!'
+    prefix = '/z' if not __testing__ else '!z'
     bot = ZardozBot(command_prefix=prefix)
 
     @bot.event

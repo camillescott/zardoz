@@ -26,10 +26,14 @@ class RollCommands(commands.Cog, LoggingMixin):
 
         super().__init__()
 
-    @commands.command(name='z', help='Evaluate a dice roll.')
+    @commands.command(name='r', aliases=['roll'])
     @fetch_guild_db
     @handle_http_exception
-    async def zardoz_roll(self, ctx, *, args):
+    async def roll(self, ctx, *, args):
+        '''
+        Evaluate a dice roll and reply to the requester with the result
+        in the source channel.
+        '''
 
         try:
             roll = RollHandler(ctx, self.log, ctx.variables, args,
@@ -41,11 +45,14 @@ class RollCommands(commands.Cog, LoggingMixin):
             await roll.add_to_db(ctx.guild_db)
             await ctx.message.reply(roll.msg())
 
-    @commands.command(name='zq', help='Evaluate a dice roll, quietly.')
+    @commands.command(name='q', aliases=['quiet'])
     @fetch_guild_db
     @handle_http_exception
-    async def zardoz_quiet_roll(self, ctx, *, args):
-
+    async def quiet_roll(self, ctx, *, args):
+        '''
+        Evaluate a dice roll and reply to the requester with a simplified result
+        in the source channel.
+        '''
         try:
             roll = QuietRollHandler(ctx, self.log, ctx.variables, args,
                                     game_mode=ctx.game_mode)
@@ -56,10 +63,14 @@ class RollCommands(commands.Cog, LoggingMixin):
             await roll.add_to_db(ctx.guild_db)
             await ctx.message.reply(roll.msg())
 
-    @commands.command(name='zs', help='Make a secret roll and DM to member.')
+    @commands.command(name='s', aliases=['secret'])
     @fetch_guild_db
     @handle_http_exception
-    async def zardoz_secret_roll(self, ctx, member: typing.Optional[discord.Member], *, args):
+    async def secret_roll(self, ctx, member: typing.Optional[discord.Member], *, args):
+        '''
+        Evaluate a dice roll and DM the result to the given member,
+        '''
+
         if member is None:
             member = ctx.author
 
@@ -73,10 +84,15 @@ class RollCommands(commands.Cog, LoggingMixin):
             await roll.add_to_db(ctx.guild_db)
             await member.send(roll.msg())
 
-    @commands.command(name='zr', help='Reroll previous roll')
+    @commands.command(name='rr', aliases=['reroll'])
     @fetch_guild_db
     @handle_http_exception
     async def zroll_reroll(self, ctx, member: typing.Optional[discord.Member], *, args=''):
+        '''
+        Re-evaluate the previous roll of the given member, or of the requesting member
+        if not given, and reply with the result in the source channel.
+        '''
+
         if member is None:
             member = ctx.author
 

@@ -24,10 +24,14 @@ class HistoryCommands(commands.Cog, LoggingMixin):
 
         super().__init__()
 
-    @commands.command(name='zhist', help='Display roll history.')
+    @commands.command(name='hist', aliases=['history'])
     @fetch_guild_db
-    async def zhist(self, ctx, member: typing.Optional[discord.Member],
+    async def history(self, ctx, member: typing.Optional[discord.Member],
                                max_rolls: typing.Optional[int] = 5):
+        '''
+        Display the roll history for the given member, or for the server
+        if a member is not specified.
+        '''
 
         records = [r async for r in ctx.guild_db.get_rolls(max_rolls=max_rolls)]
 

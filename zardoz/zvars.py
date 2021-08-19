@@ -20,14 +20,20 @@ class VarCommands(commands.Cog, LoggingMixin):
 
         super().__init__()
 
-    @commands.group(name='zvar', help='Manage variables for the server.')
-    async def zvar(self, ctx):
+    @commands.group(name='var')
+    async def var(self, ctx):
+        '''
+        Manage variables for the server.
+        '''
         if ctx.invoked_subcommand is None:
             pass
 
-    @zvar.command(name='list', help='Print current variables.')
+    @zvar.command(name='list')
     @fetch_guild_db
-    async def zvar_list(self, ctx):
+    async def var_list(self, ctx):
+        '''
+        List currently set variables and values.
+        '''
         variables = await ctx.guild_db.get_guild_vars()
         if variables:
             result = [f'**{key}**: {val}' for key, val in variables.items()]
@@ -35,23 +41,32 @@ class VarCommands(commands.Cog, LoggingMixin):
         else:
             await ctx.send('**No variables set.**')
     
-    @zvar.command(name='set', help='Set variables for the server.')
+    @zvar.command(name='set')
     @fetch_guild_db
-    async def zvar_set(self, ctx, var: str, val: int):
+    async def var_set(self, ctx, var: str, val: int):
+        '''
+        Set a variable.
+        '''
         await ctx.guild_db.set_guild_var(ctx.author.id, var, val)
         await ctx.send(f'**{var}** = {val}')
 
-    @zvar.command(name='get', help='Print a variable value.')
+    @zvar.command(name='get')
     @fetch_guild_db
-    async def zvar_get(self, ctx, var: str):
+    async def var_get(self, ctx, var: str):
+        '''
+        Get the given variable's value.
+        '''
         val = await ctx.guild_db.get_guild_var(var)
         if val is None:
             await ctx.send(f'**{var}** is not defined.')
         else:
             await ctx.send(f'**{var}** = {val}')
 
-    @zvar.command(name='del', help='Delete a variable.')
+    @zvar.command(name='del')
     @fetch_guild_db
-    async def zvar_del(self, ctx, var: str):
+    async def var_del(self, ctx, var: str):
+        '''
+        Delete the given variable.
+        '''
         await ctx.guild_db.del_guild_var(var)
         await ctx.send(f'**{var}** deleted')

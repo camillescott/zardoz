@@ -26,10 +26,13 @@ class SampleCommands(commands.Cog, LoggingMixin):
 
         super().__init__()
 
-    @commands.command(name='zsample', help='Sample from discrete distributions.')
+    @commands.command(name='sample')
     @fetch_guild_db
     @handle_http_exception
-    async def zsample(self, ctx, k: int, N: int, *, args=''):
+    async def sample(self, ctx, k: int, N: int, *, args=''):
+        '''
+        Sample integers from discreet distributions.
+        '''
         try:
             if k < 1 or N < 1:
                 raise ValueError('`k` and `N` must be greater than 1!')

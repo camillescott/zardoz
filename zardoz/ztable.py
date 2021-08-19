@@ -105,13 +105,13 @@ class TableCommands(commands.Cog, LoggingMixin):
 
         self.log.info(f'Loaded tables: {TABLES}')
 
-    @commands.group(name='ztable', help='Roll on a table.')
-    async def ztable(self, ctx):
+    @commands.group(name='table', help='Roll on a table.')
+    async def table(self, ctx):
         if ctx.invoked_subcommand is not None:
             return
 
     @ztable.command(name='get', help='Get or roll a table entry.')
-    async def ztable_get(self, ctx,
+    async def table_get(self, ctx,
                            table: TableConvert = None,
                            val: typing.Union[int, SimpleRollConvert] = None,
                            *, cmd=''):
@@ -146,7 +146,7 @@ class TableCommands(commands.Cog, LoggingMixin):
             await ctx.message.reply('\n'.join(msg))
 
     @ztable.command(name='show', help='Show the given table.')
-    async def ztable_show(self, ctx, table: TableConvert):
+    async def table_show(self, ctx, table: TableConvert):
         chunks = [Embed(title=f'{table.full_name} ({table.game}, {table.book})',
                         description=d) for d in table.paginate()]
         paginator = BotEmbedPaginator(ctx, chunks)
