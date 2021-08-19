@@ -80,7 +80,6 @@ def dize(args):
     from .database import DatabaseCache
     from .logging import setup as setup_logger
     
-    from .ztable import TableCommands
     from .zhistory import HistoryCommands
     from .zmode import ModeCommands
     from .zroll import RollCommands
@@ -127,7 +126,6 @@ def dize(args):
         await ctx.message.reply(msg)
 
     bot.add_cog(RollCommands(bot, DB))
-    bot.add_cog(TableCommands(bot, DB))
     bot.add_cog(VarCommands(bot, DB))
     bot.add_cog(ModeCommands(bot, DB))
     bot.add_cog(HistoryCommands(bot, DB))
