@@ -39,8 +39,31 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
     pass
 
 
-def main():
+def add_parser_args(parser):
+    parser.add_argument(
+        '--secret-token',
+        help='The secret token for the bot, '\
+             'from the discord developer portal. '\
+             'If you have set $ZARDOZ_TOKEN, this '\
+             'option will override that.'
+    )
+    parser.add_argument(
+        '--database-dir',
+        type=lambda p: Path(p).absolute(),
+        default=default_database_dir(debug=__testing__),
+        help='Directory for the bot databases. Default follows the '\
+             'XDG specifiction.'
+    )
+    parser.add_argument(
+        '--log',
+        type=lambda p: Path(p).absolute(),
+        default=default_log_file(debug=__testing__),
+        help='Path to the log file. Default follows the '\
+             'XDG specifiction.'
+    )
 
+
+def main():
     parser = argparse.ArgumentParser(
         description=f'{__splash__}\n{__about__}',
         formatter_class=CustomFormatter
@@ -48,27 +71,7 @@ def main():
     subparsers = parser.add_subparsers()
 
     bot = subparsers.add_parser('bot')
-    bot.add_argument(
-        '--secret-token',
-        help='The secret token for the bot, '\
-             'from the discord developer portal. '\
-             'If you have set $ZARDOZ_TOKEN, this '\
-             'option will override that.'
-    )
-    bot.add_argument(
-        '--database-dir',
-        type=lambda p: Path(p).absolute(),
-        default=default_database_dir(debug=__testing__),
-        help='Directory for the bot databases. Default follows the '\
-             'XDG specifiction.'
-    )
-    bot.add_argument(
-        '--log',
-        type=lambda p: Path(p).absolute(),
-        default=default_log_file(debug=__testing__),
-        help='Path to the log file. Default follows the '\
-             'XDG specifiction.'
-    )
+    add_parser_args(bot)
     bot.set_defaults(func=dize)
 
     args = parser.parse_args()

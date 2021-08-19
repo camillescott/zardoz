@@ -15,6 +15,5 @@ __splash__ = f'''
 __about__ = 'A discord dice-rolling bot with lots of nifty features.'
 __testing__ = bool(os.environ.get('ZARDOZ_DEBUG', False))
 
-from .zardoz import main
-
+from .cli import main
 from . import cogs
