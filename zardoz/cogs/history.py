@@ -11,9 +11,9 @@ import typing
 import discord
 from discord.ext import commands
 
-from .database import fetch_guild_db
-from .logging import LoggingMixin
-from .utils import __time_format__
+from ..database import fetch_guild_db
+from ..logging import LoggingMixin
+from ..utils import __time_format__
 
 
 class HistoryCommands(commands.Cog, LoggingMixin):

@@ -17,4 +17,4 @@ __testing__ = bool(os.environ.get('ZARDOZ_DEBUG', False))
 
 from .zardoz import main
 
-from . import rt
+from . import cogs

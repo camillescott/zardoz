@@ -8,8 +8,8 @@
 
 from discord.ext import commands
 
-from .database import fetch_guild_db
-from .logging import LoggingMixin
+from ..database import fetch_guild_db
+from ..logging import LoggingMixin
 
 
 class VarCommands(commands.Cog, LoggingMixin):

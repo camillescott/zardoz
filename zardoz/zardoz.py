@@ -80,11 +80,11 @@ def dize(args):
     from .database import DatabaseCache
     from .logging import setup as setup_logger
     
-    from .zhistory import HistoryCommands
-    from .zmode import ModeCommands
-    from .zroll import RollCommands
-    from .zsample import SampleCommands
-    from .zvars import VarCommands
+    from .cogs.history import HistoryCommands
+    from .cogs.mode import ModeCommands
+    from .cogs.roll import RollCommands
+    from .cogs.sample import SampleCommands
+    from .cogs.vars import VarCommands
 
     log = setup_logger(args.log)
 

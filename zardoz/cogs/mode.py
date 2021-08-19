@@ -10,9 +10,9 @@ import typing
 
 from discord.ext import commands
 
-from .database import fetch_guild_db
-from .logging import LoggingMixin
-from .state import GameMode, MODE_META
+from ..database import fetch_guild_db
+from ..logging import LoggingMixin
+from ..state import GameMode, MODE_META
 
 
 class ModeConvert(commands.Converter):

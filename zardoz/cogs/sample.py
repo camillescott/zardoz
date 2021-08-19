@@ -12,10 +12,10 @@ import typing
 import discord
 from discord.ext import commands
 
-from .database import fetch_guild_db
-from .logging import LoggingMixin
-from .rolls import tokenize_roll
-from .utils import handle_http_exception
+from ..database import fetch_guild_db
+from ..logging import LoggingMixin
+from ..rolls import tokenize_roll
+from ..utils import handle_http_exception
 
 
 class SampleCommands(commands.Cog, LoggingMixin):
