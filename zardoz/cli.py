@@ -31,7 +31,7 @@ import textwrap
 from discord.ext import commands
 
 from . import __version__, __splash__, __about__, __testing__
-from .utils import default_log_file, default_database_dir, EnumAction
+from .utils import default_log_file, default_database_dir
 
 
 class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
