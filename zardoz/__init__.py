@@ -17,3 +17,4 @@ __testing__ = bool(os.environ.get('ZARDOZ_DEBUG', False))
 
 from .cli import main
 from . import cogs
+from . import dice
