@@ -89,7 +89,7 @@ class Comparison(Element):
         self.operator = operator
 
     def __repr__(self):
-        return f'{self.left} {self.operator} {self.right} -> {self.predicate}, {self.delta}'
+        return f'<Comparison: {self.left} {self.operator} {self.right} -> {self.predicate}, {self.delta}>'
 
 
 class IntegerList(list, Element):
@@ -558,6 +558,8 @@ class Modulo(RHSIntegerOperator):
 
 class ComparisonOperator(Operator):
 
+    token = ''
+
     def _impl(self, left, right):
         raise NotImplementedError()
 
@@ -571,28 +573,70 @@ class ComparisonOperator(Operator):
             result = []
             for l, r in zip(left, right):
                 pred, delta = self._impl(l, r)
-                result.append(Comparison(l, r, delta, pred, '<'))
+                result.append(Comparison(l, r, delta, pred, self.token))
             return result
 
         elif isinstance(left, IntegerList):
             result = []
             for i in left:
                 pred, delta = self._impl(i, right)
-                result.append(Comparison(i, right, delta, pred, '<'))
+                result.append(Comparison(i, right, delta, pred, self.token))
             return result
         else:
             result = []
             for i in right:
                 pred, delta = self._impl(left, i)
-                result.append(Comparison(left, i, delta, pred, '<'))
+                result.append(Comparison(left, i, delta, pred, self.token))
             return result
+
+
+class Equals(ComparisonOperator):
+
+    token = '=='
+
+    def _impl(self, left, right):
+        result = left == right
+        delta = abs(right - left)
+        return result, delta
 
 
 class LessThan(ComparisonOperator):
 
+    token = '<'
+
     def _impl(self, left, right):
         result = left < right
-        delta = abs(right - left) + int(not result)
+        delta = abs(right - left) + (1 if not result else -1)
+        return result, delta
+
+
+class LessThanEqual(ComparisonOperator):
+
+    token = '<='
+
+    def _impl(self, left, right):
+        result = left <= right
+        delta = abs(right - left)
+        return result, delta
+
+
+class GreaterThan(ComparisonOperator):
+
+    token = '>'
+
+    def _impl(self, left, right):
+        result = left > right
+        delta = abs(right - left) + (1 if not result else -1)
+        return result, delta
+
+
+class GreaterThanEqual(ComparisonOperator):
+
+    token = '>='
+
+    def _impl(self, left, right):
+        result = left >= right
+        delta = abs(left - right)
         return result, delta
 
 

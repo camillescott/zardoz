@@ -32,7 +32,11 @@ from .elements import (
     Add,
     Identity,
     AddEvenSubOdd,
+    Equals,
     LessThan,
+    LessThanEqual,
+    GreaterThan,
+    GreaterThanEqual,
     Total,
     Sort,
     Lowest,
@@ -164,7 +168,11 @@ expression = (
             (wrap_string(Literal, "+"), 2, opAssoc.LEFT, Add.parse),
             (wrap_string(Literal, ","), 2, opAssoc.LEFT, Array.parse),
             (wrap_string(Literal, "|"), 2, opAssoc.LEFT, Extend.parse),
-            (wrap_string(Literal, "<"), 2, opAssoc.LEFT, LessThan.parse)
+            (wrap_string(Literal, "<"), 2, opAssoc.LEFT, LessThan.parse),
+            (wrap_string(Literal, "<="), 2, opAssoc.LEFT, LessThanEqual.parse),
+            (wrap_string(Literal, ">"), 2, opAssoc.LEFT, GreaterThan.parse),
+            (wrap_string(Literal, ">="), 2, opAssoc.LEFT, GreaterThanEqual.parse),
+            (wrap_string(Literal, '=='), 2, opAssoc.LEFT, Equals.parse),
         ],
     )
     + StringEnd()
