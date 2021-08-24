@@ -81,15 +81,15 @@ class String(str, Element):
 
 class Comparison(Element):
 
-    def __init__(self, left, right, delta, predicate, operator):
+    def __init__(self, left, right, delta, value, operator):
         self.left = left
         self.right = right
         self.delta = delta
-        self.predicate = predicate
+        self.value = value
         self.operator = operator
 
     def __repr__(self):
-        return f'<Comparison: {self.left} {self.operator} {self.right} -> {self.predicate}, {self.delta}>'
+        return f'<Comparison: {self.left} {self.operator} {self.right} -> {self.value}, {self.delta}>'
 
 
 class IntegerList(list, Element):
@@ -493,7 +493,7 @@ class Div(RHSIntegerOperator):
 
             return left
         except TypeError as e:
-            return operator.floordiv(left, scalar)
+            return Integer(perator.floordiv(left, scalar))
 
 
 class Mul(RHSIntegerOperator):
@@ -508,7 +508,7 @@ class Mul(RHSIntegerOperator):
 
             return left
         except TypeError as e:
-            return operator.mul(left, scalar)
+            return Integer(operator.mul(left, scalar))
 
 
 class Sub(RHSIntegerOperator):
@@ -523,7 +523,7 @@ class Sub(RHSIntegerOperator):
 
             return left
         except TypeError as e:
-            return operator.sub(left, scalar)
+            return Integer(operator.sub(left, scalar))
 
 
 class Add(RHSIntegerOperator):
@@ -538,7 +538,7 @@ class Add(RHSIntegerOperator):
 
             return left
         except TypeError as e:
-            return operator.add(left, scalar)
+            return Integer(operator.add(left, scalar))
 
 
 class Modulo(RHSIntegerOperator):
@@ -553,7 +553,7 @@ class Modulo(RHSIntegerOperator):
 
             return left
         except TypeError as e:
-            return operator.mod(left, scalar)
+            return Integer(operator.mod(left, scalar))
 
 
 class ComparisonOperator(Operator):
@@ -572,21 +572,21 @@ class ComparisonOperator(Operator):
             
             result = []
             for l, r in zip(left, right):
-                pred, delta = self._impl(l, r)
-                result.append(Comparison(l, r, delta, pred, self.token))
+                value, delta = self._impl(l, r)
+                result.append(Comparison(l, r, delta, value, self.token))
             return result
 
         elif isinstance(left, IntegerList):
             result = []
             for i in left:
-                pred, delta = self._impl(i, right)
-                result.append(Comparison(i, right, delta, pred, self.token))
+                value, delta = self._impl(i, right)
+                result.append(Comparison(i, right, delta, value, self.token))
             return result
         else:
             result = []
             for i in right:
-                pred, delta = self._impl(left, i)
-                result.append(Comparison(left, i, delta, pred, self.token))
+                value, delta = self._impl(left, i)
+                result.append(Comparison(left, i, delta, value, self.token))
             return result
 
 
