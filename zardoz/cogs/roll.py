@@ -14,7 +14,7 @@ from discord.ext import commands
 from ..database import fetch_guild_db
 from ..logging import LoggingMixin
 from ..rolls import (RollHandler, QuietRollHandler, SekretRollHandler, RerollHandler,
-                    RollList, DiceDelta, tokenize_roll)
+                    tokenize_roll)
 from ..utils import handle_http_exception
 
 

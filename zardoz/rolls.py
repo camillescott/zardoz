@@ -6,7 +6,6 @@
 # Author : Camille Scott <camille.scott.w@gmail.com>
 # Date   : 22.02.2021
 
-import dice
 from dice import DiceBaseException
 from discord.ext import commands
 
@@ -16,11 +15,14 @@ import re
 from .database import ZardozDatabase
 from .state import GameMode, MODE_DICE
 from .utils import SUCCESS, FAILURE
+from .dice import roll as roll_expr
+from .dice.elements import Comparison, Dice
+from .dice.utilities import single
 
 
 log = logging.getLogger()
 
-OPS = ['+', '-', '<=', '<', '>=', '>', '(', ')', r'#']
+OPS = ['+', '-', '<=', '<', '>=', '>', '(', ')', '==', '.+', '.-', '|', r'#']
 DELIMS = [r'\s']
 SPLIT_PAT = '|'.join(list(map(re.escape, OPS)) + DELIMS)
 
@@ -96,28 +98,36 @@ def expand_tokens(tokens, mode = None, variables = {}):
             if token == 'r':
                 token = MODE_DICE[mode]
 
-            ndice = re.match(r'^\d+', token)
-            if ndice is not None and int(ndice.group(0)) > 69:
-                log.error(f'Too many dice.')
-                raise ValueError(f'Woah there cowboy, you trying to crash me? Try using 69 or less dice.')
-            try:
-                resolved = dice.roll(token)
-            except DiceBaseException:
-                log.error(f'Got invalid token: {token}.')
-                raise ValueError(f'I don\'t like this argument: `{token}`.')
-            else:
-                log.info(f'Rolled a token: {token} -> {resolved}')
-                expanded.append(RollList(token, resolved))
+            expanded.append(token)
 
     return expanded
 
 
-def evaluate_expr(expanded_tokens):
-    eval_expr = ' '.join([(repr(t) if not isinstance(t, str) else t) for t in expanded_tokens])
+def parse_tokens(tokens, **kwargs):
+    eval_expr = ' '.join((str(token) for token in tokens))
     try:
-        return eval(eval_expr), eval_expr
+        return roll_expr(eval_expr, **kwargs), eval_expr
     except SyntaxError as e:
         return None, eval_expr
+
+
+def roll_expression(roll_expr, variables = {}, require_tag=False,
+                    game_mode=GameMode.DEFAULT, **kwargs):
+    tokens, tag = tokenize_roll(roll_expr)
+    expanded = expand_tokens(tokens,
+                             mode = game_mode,
+                             variables = variables)
+    result, eval_expr = parse_tokens(expanded, **kwargs)
+
+    return result, expanded, tag, eval_expr
+
+
+def extract_rolls(elements, rolls):
+    for e in elements:
+        if isinstance(e, Dice):
+            rolls.append(e)
+        elif hasattr(e, 'tokens'):
+            extract_rolls(e.tokens, rolls)
 
 
 class RollHandler:
@@ -141,9 +151,9 @@ class RollHandler:
                                       mode = self.game_mode,
                                       variables = variables)
         self.log.info(f'Expanded tokens: {self.expanded}')
-        self.expr =  ' '.join((str(token) for token in self.expanded))
         
-        self.result, eval_expr = evaluate_expr(self.expanded)
+        result, self.expr = parse_tokens(self.expanded, single=False, raw=True)
+        self.result = RollResult(self.expr, result)
         if self.result is None:
             log.error(f'Python parsing error: {eval_expr}.')
             raise ValueError(f'Your syntax was scintillating, but I couldn\'t parse it.')
@@ -157,7 +167,7 @@ class RollHandler:
     def msg(self):
         header = f':game_die: {self.ctx.author.mention}' + (f': *{self.tag}*' if self.tag else '')
         result = [f'***Request:***  `{" ".join(self.tokens)}`\n',
-                  f'***Rolled out:***  `{self.expr}`\n',
+                  f'***Rolls:***  `{self.result.describe_rolls()}`\n',
                   f'***Result:***\n```{self.result.describe(mode=self.game_mode)}```']
         result = ''.join(result)
         msg = '\n'.join((header, result))
@@ -168,10 +178,11 @@ class RollHandler:
         ret = f'<RollHander'\
               f' cmd="{self.roll}"'\
               f' from={self.ctx.author}'\
-              f' guild={self.ctx.guild}'\
+              f' guild="{self.ctx.guild}"'\
               f' tokens={self.tokens}'\
               f' tag="{self.tag}"'\
               f' expanded={self.expanded}'\
+              f' rolls="{self.result.describe_rolls()}"'\
               f' result={self.result}>'
         return ret
 
@@ -191,7 +202,7 @@ class SekretRollHandler(RollHandler):
     def msg(self):
         header = f':game_die: from **{self.ctx.author}** in **{self.ctx.guild}**: ' + (f'*{self.tag}*' if self.tag else '')
         result = [f'***Request:***  `{" ".join(self.tokens)}`\n',
-                  f'***Rolled out:***  `{self.expr}`\n',
+                  f'***Rolls:***  `{self.result.describe_rolls()}`\n',
                   f'***Result:***\n```{self.result.describe(mode=self.game_mode)}```']
         result = ''.join(result)
         return '\n'.join((header, result))
@@ -202,7 +213,7 @@ class RerollHandler(RollHandler):
     def msg(self, reroll_target):
         header = f':game_die: {self.ctx.author.mention} rerolls {reroll_target}' + (f': *{self.tag}*' if self.tag else '')
         result = [f'***Request:***  `{" ".join(self.tokens)}`\n',
-                  f'***Rolled out:***  `{self.expr}`\n',
+                  f'***Rolls:***  `{self.result.describe_rolls()}`\n',
                   f'***Result:***\n```{self.result.describe(mode=self.game_mode)}```']
         result = ''.join(result)
         msg = '\n'.join((header, result))
@@ -210,33 +221,34 @@ class RerollHandler(RollHandler):
         return msg
 
 
-class DieResult:
+class RollResult:
 
-    def __init__(self, expr, result):
-        if not isinstance(result, int):
-            raise ValueError(f'Must be scalar (got {result}).')
-        self.expr = expr
-        self.result = result
-
-    def __str__(self):
-        return f'{self.expr} ⤳ {self.result}'
-
-    def __int__(self):
-        return self.result
-
-
-class RollList:
     def __init__(self, expr, roll):
         self.expr = expr
+        self.roll_elements = roll
+        roll = single([e.evaluate_cached() for e in roll])
 
         if isinstance(roll, int):
             self.roll = [roll]
         else:
-            self.roll = list(roll)
+            self.roll = []
+            for item in roll:
+                if isinstance(item, Comparison):
+                    self.roll.append(DiceComparison(item))
+                else:
+                    self.roll.append(DiceResult(item))
 
-    def describe(self, **kwargs):
-        dsc = ', '.join((str(r) for r in self.roll))
+    def describe(self, mode='', **kwargs):
+        dsc = '\n'.join((r.describe(mode=mode, expr=self.expr) for r in self.roll))
         return dsc if dsc else '0'
+
+    def describe_rolls(self):
+        rolls = []
+        extract_rolls(self.roll_elements, rolls)
+        dsc = []
+        for roll in rolls:
+            dsc.append(f'{roll} ⤳ {roll.evaluate_cached()}')
+        return ', '.join(dsc)
 
     def __iter__(self):
         for r in self.roll:
@@ -250,72 +262,41 @@ class RollList:
 
     def __repr__(self):
         return f'RollList("{self.expr}", {self.roll})'
+
+
+class DiceResult:
+
+    def __init__(self, result):
+        if not isinstance(result, int):
+            raise ValueError(f'Must be scalar (got {result}).')
+        self.result = result
+
+    def describe(self, **kwargs):
+        return f'{self.result}'
+
+    def __int__(self):
+        return self.result
     
-    def __add__(self, other):
-        if isinstance(other, RollList):
-            return RollList(f'{self} + {other}', self.roll + other.roll)
-        else:
-            return RollList(f'{self} + {other}', (r + other for r in self.roll))
 
-    def __neg__(self):
-        return RollList(f'-{self}', (-r for r in self.roll))
+class DiceComparison(Comparison):
 
-    def __pos__(self):
-        return RollList(f'+{self}', (+r for r in self.roll))
+    def __init__(self, other):
+        super().__init__(other.left, other.right , other.delta, other.value, other.operator)
 
-    def __sub__(self, other):
-        return RollList(f'{self} - {other}', (r - other for r in self.roll))
-
-    def __lt__(self, other):
-        preds =  [r < other for r in self.roll]
-        deltas = [abs(other - r) + int(not p) for r, p in zip(self.roll, preds)]
-        return DiceDelta(self.roll, deltas, preds, f'{self} < {other}')
-
-    def __le__(self, other):
-        preds = [r <= other for r in self.roll]
-        deltas = [abs(other - r) for r in self.roll]
-        return DiceDelta(self.roll, deltas, preds, f'{self} <= {other}')
-
-    def __eq__(self, other):
-        return [r == other for r in self.roll]
-
-    def __gt__(self, other):
-        preds = [r > other for r in self.roll]
-        deltas = [abs(other - r) + int(not p) for r, p in zip(self.roll, preds)]
-        return DiceDelta(self.roll, deltas, preds, f'{self} > {other}')
-
-    def __ge__(self, other):
-        preds = [r >= other for r in self.roll]
-        deltas = [abs(r - other) for r in self.roll]
-        return DiceDelta(self.roll, deltas, preds, f'{self} >= {other}')
-
-
-class DiceDelta:
-
-    def __init__(self, rolls, deltas, predicates, expr=''):
-        self.rolls = rolls
-        self.deltas = deltas
-        self.predicates = predicates
-        self.expr = expr
-
-    def describe(self, mode = None):
+    def describe(self, mode = None, expr = '', **kwargs):
         if mode is not None and not isinstance(mode, GameMode):
             raise ValueError('mode must be of type GameMode')
-        desc = []
-        for roll, delta, pred in zip(self.rolls, self.deltas, self.predicates):
-            if mode is GameMode.RT and 'd100' in self.expr:
-                degrees = delta // 10
-                status = SUCCESS if pred else FAILURE
-                if degrees > 0:
-                    result = f'{status} {degrees}°'
-                else:
-                    result = status
-                desc.append(f'{roll:4} ⤳ {result}')
+        if mode is GameMode.RT and 'd100' in expr:
+            degrees = self.delta // 10
+            status = SUCCESS if self.value else FAILURE
+            if degrees > 0:
+                result = f'{status} {degrees}°'
             else:
-                kind = f'{SUCCESS} by' if pred else f'{FAILURE} by'
-                desc.append(f'{roll:4} ⤳ {kind} {delta}')
-        desc = '\n'.join(desc)
-        return desc if desc else '0'
+                result = status
+            return f'{self.left:4} ⤳ {result}'
+        else:
+            kind = f'{SUCCESS} by' if self.value else f'{FAILURE} by'
+            return f'{self.left:4} {self.operator} {self.right:<4} ⤳ {kind} {self.delta}'
 
 
 class SimpleRollConvert(commands.Converter):
