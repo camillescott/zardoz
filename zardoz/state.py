@@ -30,3 +30,4 @@ MODE_DICE = {GameMode.DEFAULT: '1d6',
              GameMode.DND: '1d20',
              GameMode.AW: '2d6t'}
 
+MAX_DICE_PER_ROLL = 64

@@ -13,10 +13,11 @@ import logging
 import re
 
 from .database import ZardozDatabase
-from .state import GameMode, MODE_DICE
+from .state import GameMode, MODE_DICE, MAX_DICE_PER_ROLL
 from .utils import SUCCESS, FAILURE
 from .dice import roll as roll_expr
 from .dice.elements import Comparison, Dice
+from .dice.exceptions import DiceBaseException
 from .dice.utilities import single
 
 
@@ -107,8 +108,8 @@ def parse_tokens(tokens, **kwargs):
     eval_expr = ' '.join((str(token) for token in tokens))
     try:
         return roll_expr(eval_expr, **kwargs), eval_expr
-    except SyntaxError as e:
-        return None, eval_expr
+    except DiceBaseException as e:
+        raise ValueError(e)
 
 
 def roll_expression(roll_expr, variables = {}, require_tag=False,
@@ -226,7 +227,10 @@ class RollResult:
     def __init__(self, expr, roll):
         self.expr = expr
         self.roll_elements = roll
-        roll = single([e.evaluate_cached() for e in roll])
+        try:
+            roll = single([e.evaluate_cached(max_dice=MAX_DICE_PER_ROLL) for e in roll])
+        except DiceBaseException as e:
+            raise ValueError(e)
 
         if isinstance(roll, int):
             self.roll = [roll]
