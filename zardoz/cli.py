@@ -39,6 +39,16 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
     pass
 
 
+class Bot(commands.Bot):
+
+    async def close(self):
+        log.info('DatabaseCache close()')
+        await DB.close()
+        log.info('Bot close()')
+        await super().close()
+        log.info('Bot closed.')
+
+
 def add_parser_args(parser):
     parser.add_argument(
         '--secret-token',
@@ -72,13 +82,32 @@ def main():
 
     bot = subparsers.add_parser('bot')
     add_parser_args(bot)
-    bot.set_defaults(func=dize)
+    bot.set_defaults(func=run_bot)
 
     args = parser.parse_args()
     args.func(args)
 
 
-def dize(args):
+def run_bot(args):
+
+    bot = build_bot(args)
+
+    @bot.event
+    async def on_ready():
+        log.info(f'Ready: member of {bot.guilds}')
+        log.info(f'Users: {bot.users}')
+
+    @bot.command(name='zabout', help='Project info.')
+    async def zabout(ctx):
+        msg = f'version: {__version__}\n'\
+              f'source: https://github.com/camillescott/zardoz/releases/tag/v{__version__}\n'\
+              f'active installs: {len(bot.guilds)}'
+        await ctx.message.reply(msg)
+
+    bot.run(args.secret_token)
+
+
+def build_bot(args, token_name = 'ZARDOZ_TOKEN', prefix = 'z'):
 
     from .database import DatabaseCache
     from .logging import setup as setup_logger
@@ -94,39 +123,19 @@ def dize(args):
     TOKEN = args.secret_token
     if not TOKEN:
         try:
-            TOKEN = os.environ['ZARDOZ_TOKEN']
+            TOKEN = os.environ[token_name]
         except KeyError:
-            log.error('Must set ZARDOZ_TOKEN or use --secret-token')
+            log.error(f'Must set {token_name} or use --secret-token')
             sys.exit(1)
         else:
-            log.info('Got secret token from $ZARDOZ_TOKEN.')
+            log.info('Got secret token from ${token_name}.')
+    args.secret_token = token
 
     # get a handle for the history database
     DB = DatabaseCache(args.database_dir)
 
-    class ZardozBot(commands.Bot):
-
-        async def close(self):
-            log.info('DatabaseCache close()')
-            await DB.close()
-            log.info('Bot close()')
-            await super().close()
-            log.info('Bot closed.')
-
-    prefix = '/z' if not __testing__ else '!z'
-    bot = ZardozBot(command_prefix=prefix)
-
-    @bot.event
-    async def on_ready():
-        log.info(f'Ready: member of {bot.guilds}')
-        log.info(f'Users: {bot.users}')
-
-    @bot.command(name='zabout', help='Project info.')
-    async def zabout(ctx):
-        msg = f'version: {__version__}\n'\
-              f'source: https://github.com/camillescott/zardoz/releases/tag/v{__version__}\n'\
-              f'active installs: {len(bot.guilds)}'
-        await ctx.message.reply(msg)
+    prefix = f'/{prefix}' if not __testing__ else '!{prefix}'
+    bot = Bot(command_prefix=prefix)
 
     bot.add_cog(RollCommands(bot, DB))
     bot.add_cog(VarCommands(bot, DB))
@@ -134,7 +143,7 @@ def dize(args):
     bot.add_cog(HistoryCommands(bot, DB))
     bot.add_cog(SampleCommands(bot, DB))
 
-    bot.run(TOKEN)
+    return bot
 
 
 if __name__ == '__main__':
