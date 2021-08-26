@@ -297,7 +297,7 @@ class DiceComparison(Comparison):
                 result = f'{status} {degrees}°'
             else:
                 result = status
-            return f'{self.left:4} ⤳ {result}'
+            return f'{self.left:4} {self.operator} {self.right:<4} ⤳ {result}'
         else:
             kind = f'{SUCCESS} by' if self.value else f'{FAILURE} by'
             return f'{self.left:4} {self.operator} {self.right:<4} ⤳ {kind} {self.delta}'
