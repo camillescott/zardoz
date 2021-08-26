@@ -23,6 +23,7 @@
 
 import argparse
 import json
+import logging
 import os
 from pathlib import Path
 import sys
@@ -42,20 +43,21 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 class Bot(commands.Bot):
 
     async def close(self):
+        log = logging.getLogger()
         log.info('DatabaseCache close()')
-        await DB.close()
+        await self.DB.close()
         log.info('Bot close()')
         await super().close()
         log.info('Bot closed.')
 
 
-def add_parser_args(parser):
+def add_parser_args(parser, token_name='ZARDOZ_TOKEN'):
     parser.add_argument(
         '--secret-token',
-        help='The secret token for the bot, '\
-             'from the discord developer portal. '\
-             'If you have set $ZARDOZ_TOKEN, this '\
-             'option will override that.'
+        help=f'The secret token for the bot, '\
+             f'from the discord developer portal. '\
+             f'If you have set ${token_name}, this '\
+             f'option will override that.'
     )
     parser.add_argument(
         '--database-dir',
@@ -90,10 +92,11 @@ def main():
 
 def run_bot(args):
 
-    bot = build_bot(args)
+    bot, db = build_bot(args)
 
     @bot.event
     async def on_ready():
+        log = logging.getLogger()
         log.info(f'Ready: member of {bot.guilds}')
         log.info(f'Users: {bot.users}')
 
@@ -129,13 +132,14 @@ def build_bot(args, token_name = 'ZARDOZ_TOKEN', prefix = 'z'):
             sys.exit(1)
         else:
             log.info('Got secret token from ${token_name}.')
-    args.secret_token = token
+    args.secret_token = TOKEN
 
     # get a handle for the history database
     DB = DatabaseCache(args.database_dir)
 
     prefix = f'/{prefix}' if not __testing__ else '!{prefix}'
     bot = Bot(command_prefix=prefix)
+    bot.DB = DB
 
     bot.add_cog(RollCommands(bot, DB))
     bot.add_cog(VarCommands(bot, DB))
@@ -143,7 +147,7 @@ def build_bot(args, token_name = 'ZARDOZ_TOKEN', prefix = 'z'):
     bot.add_cog(HistoryCommands(bot, DB))
     bot.add_cog(SampleCommands(bot, DB))
 
-    return bot
+    return bot, DB
 
 
 if __name__ == '__main__':
