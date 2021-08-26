@@ -128,16 +128,17 @@ def build_bot(args, token_name = 'ZARDOZ_TOKEN', prefix = 'z'):
         try:
             TOKEN = os.environ[token_name]
         except KeyError:
-            log.error(f'Must set {token_name} or use --secret-token')
+            log.error(f'Must set ${token_name} or use --secret-token')
             sys.exit(1)
         else:
-            log.info('Got secret token from ${token_name}.')
+            log.info(f'Got secret token from ${token_name}.')
     args.secret_token = TOKEN
 
     # get a handle for the history database
     DB = DatabaseCache(args.database_dir)
 
-    prefix = f'/{prefix}' if not __testing__ else '!{prefix}'
+    prefix = f'/{prefix}' if not __testing__ else f'!{prefix}'
+    log.info(f'Prefix is: {prefix}')
     bot = Bot(command_prefix=prefix)
     bot.DB = DB
 
