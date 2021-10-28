@@ -110,7 +110,7 @@ def run_bot(args):
     bot.run(args.secret_token)
 
 
-def build_bot(args, token_name = 'ZARDOZ_TOKEN', prefix = 'z'):
+def build_bot(args, token_name='ZARDOZ_TOKEN', prefix='z', loop=None):
 
     from .database import DatabaseCache
     from .logging import setup as setup_logger
@@ -139,7 +139,7 @@ def build_bot(args, token_name = 'ZARDOZ_TOKEN', prefix = 'z'):
 
     prefix = f'/{prefix}' if not __testing__ else f'!{prefix}'
     log.info(f'Prefix is: {prefix}')
-    bot = Bot(command_prefix=prefix)
+    bot = Bot(command_prefix=prefix, loop=loop)
     bot.DB = DB
 
     bot.add_cog(RollCommands(bot, DB))
