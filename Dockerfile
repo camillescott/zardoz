@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM gorialis/discord.py:3.8-alpine
-LABEL zardoz_version="1.0.0"
+LABEL zardoz_version="1.0.1"
 WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
