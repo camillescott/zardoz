@@ -582,12 +582,15 @@ class ComparisonOperator(Operator):
                 value, delta = self._impl(i, right)
                 result.append(Comparison(i, right, delta, value, self.token))
             return result
-        else:
+        elif isinstance(right, IntegerList):
             result = []
             for i in right:
                 value, delta = self._impl(left, i)
                 result.append(Comparison(left, i, delta, value, self.token))
             return result
+        else:
+            value, delta = self._impl(left, right)
+            return [Comparison(left, right, delta, value, self.token)]
 
 
 class Equals(ComparisonOperator):
