@@ -32,7 +32,7 @@ import textwrap
 from discord.ext import commands
 
 from . import __version__, __splash__, __about__, __testing__
-from .utils import default_log_file, default_database_dir
+from .utils import default_log_file, default_database_dir, SYNTAX
 
 
 class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
@@ -100,12 +100,16 @@ def run_bot(args):
         log.info(f'Ready: member of {bot.guilds}')
         log.info(f'Users: {bot.users}')
 
-    @bot.command(name='zabout', help='Project info.')
+    @bot.command(name='about', help='Project info.')
     async def zabout(ctx):
         msg = f'version: {__version__}\n'\
               f'source: https://github.com/camillescott/zardoz/releases/tag/v{__version__}\n'\
               f'active installs: {len(bot.guilds)}'
         await ctx.message.reply(msg)
+
+    @bot.command(name='syntax', help='Rolling syntax')
+    async def zsyntax(ctx):
+        await ctx.message.reply(SYNTAX)
 
     bot.run(args.secret_token)
 

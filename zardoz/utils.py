@@ -21,8 +21,30 @@ from xdg import xdg_data_home
 ZARDOZ_PKG_DIR = os.path.abspath(os.path.dirname(__file__))
 __time_format__ = '%a %b %d %I:%M%p %Z'
 
-FAILURE = 'F 🛇'
-SUCCESS = 'S ✅'
+FAILURE = 'F 👎'
+SUCCESS = 'S 👍'
+
+
+SYNTAX = '''```
+dX: Roll an X-sided die.
+    Ex: d20
+NdX: roll N X-sided dice.
+    Ex: 3d6
+NdXt: roll N x-sided dice and sum result.
+    Ex: 3d6t
+NdX [+,-,*,/,%] M: Apply operation with M to each roll result.
+    Ex: 3d10 + 4; 3d6t + 4; 3d6 - 3; 10d2 % 2
+NdX [<,<=,==,>,>=] M: Compare each roll to M. M may be integer, list, or roll.
+    Ex: 3d10 < 5; 3d10 <= 3d10; 3d10 < 2d5t; 3d10 <= 4,5,6
+NdX^M: Roll NdX and report the highest M results.
+    Ex: 5d10^2
+NdX | MdY: Concatenate roll results.
+    Ex: 5d10 | 10d6
+```
+
+The roll parser is a modified form of the `python-dice` library. For more advanced usage, see https://pypi.org/project/dice/.
+
+'''
 
 
 def d10():
