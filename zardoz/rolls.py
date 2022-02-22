@@ -16,7 +16,7 @@ from .database import ZardozDatabase
 from .state import GameMode, MODE_DICE, MAX_DICE_PER_ROLL
 from .utils import SUCCESS, FAILURE
 from .dice import roll as roll_expr
-from .dice.elements import Comparison, Dice
+from .dice.elements import Comparison, Dice, Integer
 from .dice.exceptions import DiceBaseException
 from .dice.utilities import single
 
@@ -166,13 +166,16 @@ class RollHandler:
                           ' '.join(self.tokens), self.tag, self.expr)
 
     def msg(self):
+        log = logging.getLogger()
+        log.info(f'RollHandler msg: result {self.result.describe(mode=self.game_mode)}')
         header = f':game_die: {self.ctx.author.mention}' + (f': *{self.tag}*' if self.tag else '')
         result = [f'***Request:***  `{" ".join(self.tokens)}`\n',
                   f'***Rolls:***  `{self.result.describe_rolls()}`\n',
-                  f'***Result:***\n```{self.result.describe(mode=self.game_mode)}```']
+                  f'***Result:***\n```\n{self.result.describe(mode=self.game_mode)}```']
         result = ''.join(result)
         msg = '\n'.join((header, result))
 
+        log.info(f'RollHandler.msg: {msg}')
         return msg
 
     def __str__(self):
@@ -232,8 +235,10 @@ class RollResult:
         except DiceBaseException as e:
             raise ValueError(e)
 
-        if isinstance(roll, int):
-            self.roll = [roll]
+        log = logging.getLogger()
+        log.info(f'Building RollResult from {roll}')
+        if isinstance(roll, (int, Integer)):
+            self.roll = [DiceResult(int(roll))]
         else:
             self.roll = []
             for item in roll:
@@ -241,6 +246,7 @@ class RollResult:
                     self.roll.append(DiceComparison(item))
                 else:
                     self.roll.append(DiceResult(item))
+        log.info(f'Built roll result: {self.roll}')
 
     def describe(self, mode='', **kwargs):
         dsc = '\n'.join((r.describe(mode=mode, expr=self.expr) for r in self.roll))
@@ -252,7 +258,7 @@ class RollResult:
         dsc = []
         for roll in rolls:
             dsc.append(f'{roll} ⤳ {roll.evaluate_cached()}')
-        return ', '.join(dsc)
+        return ', '.join(dsc) if dsc else 'None'
 
     def __iter__(self):
         for r in self.roll:
